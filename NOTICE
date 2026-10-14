@@ -1,0 +1,16 @@
+AMLL Speech Practice is a modified version of AMLL Web Player.
+Upstream: https://github.com/HKLHaoBin/amll-web
+Snapshot: 60346fb3e4a6552740fe2c6826689a466877a92c (branch amlw)
+Original project: https://github.com/BingoKingo/amll-web
+Original authors/contributors: BingoKingo, HKLHaoBin, and upstream contributors.
+AMLL rendering library: SteveXMH / applemusic-like-lyrics (GPL-3.0).
+
+Modifications dated 2026-10-14: speech practice controls, explicit seek clock,
+pointer/tap arbitration, release-only drag seeking with a centre guide,
+manual-follow coordination, responsive controls, bounded rendering work,
+background resolution fix, synthetic regression tests and static deployment.
+
+The upstream LICENSE and README specify AGPL version 3; the contradictory MIT
+package metadata has been corrected to AGPL-3.0-only. LICENSE is retained verbatim.
+The exact build inputs are downloadable using the Source link in the application.
+Dependency licenses and source references remain in package metadata / the lockfile.

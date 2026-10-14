@@ -1,0 +1,37 @@
+{
+  "mouse_paused_release_once": {
+    "visible": true,
+    "start": 6000,
+    "seconds": 6,
+    "label": "00:06.000 \u00b7 \u653e\u624b\u8df3\u64ad \u00b7 Release to seek\nSynthetic sentence 3. Practice clearly."
+  },
+  "horizontal_and_other_controls_no_seek": true,
+  "touch_playing_positive_delay": {
+    "visible": true,
+    "start": 6000,
+    "seconds": 4.75,
+    "label": "00:04.750 \u00b7 \u653e\u624b\u8df3\u64ad \u00b7 Release to seek\nSynthetic sentence 3. Practice clearly."
+  },
+  "touch_paused_negative_delay": {
+    "visible": true,
+    "start": 6000,
+    "seconds": 7,
+    "label": "00:07.000 \u00b7 \u653e\u624b\u8df3\u64ad \u00b7 Release to seek\nSynthetic sentence 3. Practice clearly."
+  },
+  "drag_exits_incompatible_range": true,
+  "cancel_cancels_selection": true,
+  "multitouch_cancels_selection": true,
+  "multitouch_outside_cancels_selection": true,
+  "lost_capture_cancels_selection": true,
+  "mode_change_cancels_selection": true,
+  "outside_cancels_selection": true,
+  "delay_change_cancels_selection": true,
+  "resize_cancels_selection": true,
+  "auto_follow_cannot_commit_cancelled_drag": true,
+  "long_press_then_move_does_not_seek": true,
+  "browse_switch_and_persistence": true,
+  "first_last_line_bounds": true,
+  "missing_or_out_of_media_timestamps_no_seek": true,
+  "no_audio_no_seek": true,
+  "page_errors": []
+}

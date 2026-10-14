@@ -1,0 +1,55 @@
+{
+  "upstream": {
+    "lines": 2000,
+    "lineUpdateCallsPerFrame": 2000,
+    "updateMedianMs": 2.1999999997206032,
+    "updateP95Ms": 3.3999999999068677,
+    "background": {
+      "width": 4096,
+      "height": 3072
+    },
+    "inputTarget": {
+      "box": {
+        "x": 716.7890625,
+        "y": 457.79999999999995
+      },
+      "target": "<div class=\"_lyricMainLine_1vq69_83\" style=\"opacity: 0.2;\">Synthetic sentence 2. Practice clearly.</div>"
+    },
+    "gestureState": {
+      "manual": null,
+      "following": null,
+      "anchor": null,
+      "offset": 90,
+      "pointer": null
+    },
+    "manualTransitionDeltaPx": -377.6732482910156
+  },
+  "fixed": {
+    "lines": 2000,
+    "lineUpdateCallsPerFrame": 6,
+    "updateMedianMs": 0,
+    "updateP95Ms": 0.10000000009313226,
+    "background": {
+      "width": 2048,
+      "height": 1536
+    },
+    "inputTarget": {
+      "box": {
+        "x": 716.7890625,
+        "y": 457.79999999999995
+      },
+      "target": "<div class=\"_lyricMainLine_1vq69_83\" style=\"opacity: 0.2;\">Synthetic sentence 2. Practice clearly.</div>"
+    },
+    "gestureState": {
+      "manual": true,
+      "following": false,
+      "anchor": 0,
+      "offset": 100,
+      "pointer": {
+        "id": 2,
+        "y": 357.79998779296875
+      }
+    },
+    "manualTransitionDeltaPx": 0.0
+  }
+}

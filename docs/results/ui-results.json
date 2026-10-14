@@ -1,0 +1,263 @@
+{
+  "desktop": {
+    "controls": [
+      {
+        "selector": "#openPracticeAudio",
+        "x": 112.46875,
+        "y": 10,
+        "w": 96.453125,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#openPracticeLyrics",
+        "x": 218.921875,
+        "y": 10,
+        "w": 114.96875,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#dragSeekMode",
+        "x": 343.890625,
+        "y": 10,
+        "w": 111.96875,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#practiceToolbar a",
+        "x": 1163.28125,
+        "y": 25,
+        "w": 100.71875,
+        "h": 14,
+        "unobstructed": true
+      },
+      {
+        "selector": "#playPauseBtn",
+        "x": 71.24312591552734,
+        "y": 842.0399780273438,
+        "w": 51.91999816894531,
+        "h": 51.9200439453125,
+        "unobstructed": true
+      },
+      {
+        "selector": "#albumCoverContainer",
+        "x": 89.90469360351562,
+        "y": 212.52969360351562,
+        "w": 317.17498779296875,
+        "h": 317.1750183105469,
+        "unobstructed": true
+      }
+    ],
+    "viewport": {
+      "w": 1280,
+      "h": 900
+    },
+    "longText": {
+      "scroll": 768,
+      "client": 768
+    },
+    "mounted": 6,
+    "bodyWidth": 1280,
+    "mp3_lrc_double_tap_and_drag_seek": true
+  },
+  "landscape": {
+    "controls": [
+      {
+        "selector": "#openPracticeAudio",
+        "x": 16,
+        "y": 10,
+        "w": 96.453125,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#openPracticeLyrics",
+        "x": 122.453125,
+        "y": 10,
+        "w": 114.96875,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#dragSeekMode",
+        "x": 247.421875,
+        "y": 10,
+        "w": 111.96875,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#practiceToolbar a",
+        "x": 907.28125,
+        "y": 25,
+        "w": 100.71875,
+        "h": 14,
+        "unobstructed": true
+      },
+      {
+        "selector": "#playPauseBtn",
+        "x": 35.407188415527344,
+        "y": 710.0399780273438,
+        "w": 51.91999816894531,
+        "h": 51.9200439453125,
+        "unobstructed": true
+      },
+      {
+        "selector": "#albumCoverContainer",
+        "x": 73.11156463623047,
+        "y": 192.033447265625,
+        "w": 248.35498046875,
+        "h": 248.35498046875,
+        "unobstructed": true
+      }
+    ],
+    "viewport": {
+      "w": 1024,
+      "h": 768
+    },
+    "longText": {
+      "scroll": 614,
+      "client": 614
+    },
+    "mounted": 6,
+    "bodyWidth": 1024,
+    "mp3_lrc_double_tap_and_drag_seek": true
+  },
+  "portrait": {
+    "controls": [
+      {
+        "selector": "#openPracticeAudio",
+        "x": 16,
+        "y": 10,
+        "w": 96.453125,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#openPracticeLyrics",
+        "x": 122.453125,
+        "y": 10,
+        "w": 114.96875,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#dragSeekMode",
+        "x": 247.421875,
+        "y": 10,
+        "w": 111.96875,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#practiceToolbar a",
+        "x": 651.28125,
+        "y": 25,
+        "w": 100.71875,
+        "h": 14,
+        "unobstructed": true
+      },
+      {
+        "selector": "#playPauseBtn",
+        "x": 16.040000915527344,
+        "y": 966.0399780273438,
+        "w": 51.91999816894531,
+        "h": 51.9200439453125,
+        "unobstructed": true
+      },
+      {
+        "selector": "#albumCoverContainer",
+        "x": 36.20000076293945,
+        "y": 98.19999694824219,
+        "w": 57.60000228881836,
+        "h": 57.600006103515625,
+        "unobstructed": true
+      }
+    ],
+    "viewport": {
+      "w": 768,
+      "h": 1024
+    },
+    "longText": {
+      "scroll": 768,
+      "client": 768
+    },
+    "mounted": 6,
+    "bodyWidth": 768,
+    "portrait_spacing": {
+      "headerClear": true,
+      "lyricsClear": true
+    },
+    "mp3_lrc_double_tap_and_drag_seek": true
+  },
+  "narrow": {
+    "controls": [
+      {
+        "selector": "#openPracticeAudio",
+        "x": 8,
+        "y": 10,
+        "w": 86.453125,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#openPracticeLyrics",
+        "x": 99.453125,
+        "y": 10,
+        "w": 104.96875,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#dragSeekMode",
+        "x": 209.421875,
+        "y": 10,
+        "w": 101.96875,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#practiceToolbar a",
+        "x": 322,
+        "y": 21,
+        "w": 60,
+        "h": 22,
+        "unobstructed": true
+      },
+      {
+        "selector": "#playPauseBtn",
+        "x": 16.040000915527344,
+        "y": 786.0399780273438,
+        "w": 51.91999816894531,
+        "h": 51.9200439453125,
+        "unobstructed": true
+      },
+      {
+        "selector": "#albumCoverContainer",
+        "x": 36.20000076293945,
+        "y": 98.19999694824219,
+        "w": 57.60000228881836,
+        "h": 57.600006103515625,
+        "unobstructed": true
+      }
+    ],
+    "viewport": {
+      "w": 390,
+      "h": 844
+    },
+    "longText": {
+      "scroll": 390,
+      "client": 390
+    },
+    "mounted": 5,
+    "bodyWidth": 390,
+    "portrait_spacing": {
+      "headerClear": true,
+      "lyricsClear": true
+    },
+    "mp3_lrc_double_tap_and_drag_seek": true
+  },
+  "page_errors": []
+}

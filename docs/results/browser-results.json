@@ -1,0 +1,175 @@
+{
+  "desktop_paused_double_click": {
+    "time": 3,
+    "lyric": 3000,
+    "paused": true,
+    "following": true,
+    "range": false,
+    "hot": [
+      1
+    ],
+    "visualActive": [
+      1
+    ]
+  },
+  "desktop_playing_double_click": {
+    "time": 6.049148,
+    "lyric": 6033,
+    "paused": false,
+    "following": true,
+    "range": false,
+    "hot": [
+      2
+    ],
+    "visualActive": [
+      2
+    ]
+  },
+  "positive_delay": {
+    "time": 1.5,
+    "lyric": 3000,
+    "paused": true,
+    "following": true,
+    "range": false,
+    "hot": [
+      1
+    ],
+    "visualActive": [
+      1
+    ]
+  },
+  "negative_delay": {
+    "time": 4,
+    "lyric": 3000,
+    "paused": true,
+    "following": true,
+    "range": false,
+    "hot": [
+      1
+    ],
+    "visualActive": [
+      1
+    ]
+  },
+  "sentence_leaves_range": {
+    "time": 6,
+    "lyric": 6000,
+    "paused": true,
+    "following": true,
+    "range": false,
+    "hot": [
+      2
+    ],
+    "visualActive": [
+      2
+    ]
+  },
+  "other_seeks_clamp_range": {
+    "time": 19.999,
+    "lyric": 19999,
+    "paused": true,
+    "following": true,
+    "range": true,
+    "hot": [
+      6
+    ],
+    "visualActive": [
+      6
+    ]
+  },
+  "keyboard_sentence": {
+    "time": 3,
+    "lyric": 3000,
+    "paused": true,
+    "following": true,
+    "range": false,
+    "hot": [
+      1
+    ],
+    "visualActive": [
+      1
+    ]
+  },
+  "rapid_seek_no_timer_race": {
+    "time": 3,
+    "lyric": 3000,
+    "paused": true,
+    "following": true,
+    "range": false,
+    "hot": [
+      1
+    ],
+    "visualActive": [
+      1
+    ]
+  },
+  "touch_paused_double_tap_once": {
+    "time": 3,
+    "lyric": 3000,
+    "paused": true,
+    "following": true,
+    "range": false,
+    "hot": [
+      1
+    ],
+    "visualActive": [
+      1
+    ]
+  },
+  "touch_playing_double_tap": {
+    "time": 6.04568,
+    "lyric": 6039,
+    "paused": false,
+    "following": true,
+    "range": false,
+    "hot": [
+      2
+    ],
+    "visualActive": [
+      2
+    ]
+  },
+  "drag_does_not_seek": {
+    "time": 6,
+    "lyric": 6000,
+    "paused": true,
+    "following": false,
+    "range": false,
+    "hot": [
+      2
+    ],
+    "visualActive": [
+      2
+    ]
+  },
+  "manual_anchor_delta_px": 0.0,
+  "explicit_and_idle_follow": true,
+  "cancel_long_press_multitouch_no_seek": true,
+  "no_chromium_double_tap_zoom": true,
+  "background_dpr2": {
+    "w": 2048,
+    "h": 1536,
+    "cssW": 1024,
+    "cssH": 768,
+    "dpr": 2
+  },
+  "rotation_background": {
+    "w": 1536,
+    "h": 2048,
+    "cssW": 768,
+    "cssH": 1024
+  },
+  "saved_half_scale_restore": true,
+  "reset_scale": true,
+  "range_wrap_preserves_manual": true,
+  "long_list": {
+    "lines": 2000,
+    "mounted": 5,
+    "animated": 5,
+    "updateMedianMs": 0,
+    "updateP95Ms": 0.10000000009313226,
+    "loadSeconds": 11.963
+  },
+  "static_assets_and_source_download": true,
+  "page_errors": []
+}
