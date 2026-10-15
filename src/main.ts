@@ -24,7 +24,7 @@ import { isLqeFormat, parseLqe, lqeToTTML } from "./lyric/lqe-parser";
 import { isLylFormat, parseLyl, lylToTTML } from "./lyric/lyl-parser";
 import { isSrtFormat, parseSrt, srtToTTML } from "./lyric/srt-parser";
 import { normalizeLrcTimings } from "./lyric/lrc-timing";
-import { createPlayableAudioUrl, isAudioFile, isCaptionFile } from "./local-files";
+import { createPlayableAudioUrl, isAudioFile, isCaptionFile, waitForAudioMetadata } from "./local-files";
 
 // 导入测试脚本（仅在开发环境中使用）
 import { getCurrentLanguage, getTranslations, t } from "./i18n";
@@ -42,6 +42,8 @@ type SpringParams = spring.SpringParams;
 (window as any).lyrics = lyrics;
 import { SpeechLyricPlayer } from "./practice/speech-lyric-player";
 import { audioTimeSeconds, lyricTimeMs, clampSeek } from "./practice/timing";
+
+import { LocalSessionMemory, IndexedDBSessionStore, CorruptSessionError, type SavedCaptions, type SaveStatus } from "./practice/local-session";
 
 interface PlayerState {
   musicUrl: string;
@@ -151,6 +153,12 @@ class WebLyricsPlayer {
   private selectedLyricFile: File | null = null;
   private musicLoadId = 0;
   private lyricLoadId = 0;
+  private currentCaptions: SavedCaptions | null = null;
+  private pendingMusicImport: Promise<boolean> | null = null;
+  private restoreEpoch = 0;
+  private restoringLocal = false;
+  private localRestoreReady: Promise<void> = Promise.resolve();
+  private localMemory = new LocalSessionMemory(new IndexedDBSessionStore(), status => this.renderLocalSaveStatus(status));
   private musicFileBtn: HTMLElement | null = null;
   private lyricFileBtn: HTMLElement | null = null;
   private coverFileBtn: HTMLElement | null = null;
@@ -2885,6 +2893,7 @@ class WebLyricsPlayer {
     if (follow) this.lyricPlayer.resetScroll();
     this.audio.currentTime = bounded;
     this.syncPlayback(true);
+    this.rememberLocalProgress(true);
   }
 
   private syncPlayback(isSeek = false) {
@@ -3206,16 +3215,30 @@ class WebLyricsPlayer {
     this.updateLayoutByOrientation();
   }
 
-  private async loadMusicFromFile(file: File) {
+  private loadMusicFromFile(file: File, restoring = false): Promise<boolean> {
+    if (!restoring) this.cancelLocalRestore();
     const loadId = ++this.musicLoadId;
+    const task = this.importMusicFile(file, loadId, restoring);
+    this.pendingMusicImport = task;
+    void task.then(() => { if (this.pendingMusicImport === task) this.pendingMusicImport = null; });
+    return task;
+  }
+
+  private async importMusicFile(file: File, loadId: number, restoring: boolean): Promise<boolean> {
     let url: string | undefined;
     try {
       url = await createPlayableAudioUrl(file);
       if (loadId !== this.musicLoadId) {
         URL.revokeObjectURL(url);
-        return;
+        return false;
       }
       const previousUrl = this.state.musicUrl;
+      const previousFile = this.selectedMusicFile;
+      const sameAudio = previousFile && previousFile.name === file.name
+        && previousFile.size === file.size && previousFile.lastModified === file.lastModified;
+      // A new track starts a new pair. Captions chosen before the first audio,
+      // or a reload of the same file, keep their association.
+      if (!restoring && previousUrl && !sameAudio) this.clearCurrentCaptions();
       this.selectedMusicFile = file;
       this.state.musicUrl = url;
       this.audio.crossOrigin = "anonymous"; // 允许跨域访问音频文件
@@ -3231,14 +3254,19 @@ class WebLyricsPlayer {
         this.progressBar.style.width = "";
       }
 
-      if (this.state.autoPlay) {
+      if (this.state.autoPlay && !restoring) {
         this.togglePlayPause();
       } else {
         this.state.isPlaying = false;
         this.updatePlayButton();
       }
+      if (restoring) {
+        this.audio.pause();
+        await waitForAudioMetadata(this.audio);
+        if (loadId !== this.musicLoadId) return false;
+      }
       await this.parseAudioMetadata(file);
-      if (loadId !== this.musicLoadId) return;
+      if (loadId !== this.musicLoadId) return false;
       this.updateMediaSessionMetadata();
 
       if (this.controlPanel) {
@@ -3249,31 +3277,44 @@ class WebLyricsPlayer {
 
       this.updateFileInputDisplay("musicFile", file);
       this.showStatus(t("musicLoadSuccess"));
+      if (!restoring) this.saveLocalSession();
+      return true;
     } catch (error) {
       if (url && url !== this.state.musicUrl) URL.revokeObjectURL(url);
       if (loadId === this.musicLoadId) this.showStatus(t("musicLoadFailed"), true);
+      return false;
     }
   }
 
-  private async loadLyricFromFile(file: File) {
+  private async loadLyricFromFile(file: File, restoring = false): Promise<boolean> {
+    if (!restoring) this.cancelLocalRestore();
     const loadId = ++this.lyricLoadId;
+    const audioLoadId = this.musicLoadId;
     try {
+      // A caption selected during an audio replacement belongs to that import,
+      // never to the previous track. Failed/superseded imports cannot steal it.
+      if (this.pendingMusicImport && !await this.pendingMusicImport) return false;
+      if (loadId !== this.lyricLoadId || audioLoadId !== this.musicLoadId) return false;
       if (!file.size || !isCaptionFile(file)) {
         this.showStatus(t("lyricsLoadFailed"), true);
-        return;
+        return false;
       }
       const text = await file.text();
-      if (loadId !== this.lyricLoadId) return;
-      if (!await this.loadLyricContent(text, file.name)) return;
-      if (loadId !== this.lyricLoadId) return;
+      if (loadId !== this.lyricLoadId || audioLoadId !== this.musicLoadId) return false;
+      if (!await this.loadLyricContent(text, file.name)) return false;
+      if (loadId !== this.lyricLoadId || audioLoadId !== this.musicLoadId) return false;
       const previousUrl = this.state.lyricUrl;
       this.state.lyricUrl = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
       if (previousUrl.startsWith('blob:')) URL.revokeObjectURL(previousUrl);
       this.selectedLyricFile = file;
+      this.currentCaptions = { text, name: file.name, type: file.type, lastModified: file.lastModified };
       this.updateFileInputDisplay("lyricFile", file);
       this.showStatus(t("lyricsLoadSuccess"));
+      if (!restoring) this.saveLocalSession();
+      return true;
     } catch (error) {
       if (loadId === this.lyricLoadId) this.showStatus(t("lyricsLoadFailed"), true);
+      return false;
     }
   }
 
@@ -3422,6 +3463,9 @@ class WebLyricsPlayer {
     }
 
     if (musicUrl) {
+      this.cancelLocalRestore();
+      this.localMemory.detach();
+      this.clearCurrentCaptions();
       ++this.musicLoadId;
       this.selectedMusicFile = null;
       this.state.musicUrl = musicUrl;
@@ -3458,6 +3502,8 @@ class WebLyricsPlayer {
           if (!await this.loadLyricContent(text, lyricUrl)) return;
           if (loadId !== this.lyricLoadId) return;
           this.selectedLyricFile = null;
+          this.currentCaptions = null;
+          this.localMemory.detach();
           this.state.lyricUrl = lyricUrl;
           this.updateFileInputDisplay("lyricFile", lyricUrl);
         } catch (error) {
@@ -3618,6 +3664,9 @@ class WebLyricsPlayer {
         ++this.lyricLoadId;
         if (!await this.loadLyricContent(decodedContent, "direct-input.txt")) return false;
         this.selectedLyricFile = null;
+        this.currentCaptions = null;
+        this.cancelLocalRestore();
+        this.localMemory.detach();
         this.updateFileInputDisplay("lyricFile", `Base64 Encoded Input (${contentType})`);
         this.showStatus(t("lyricsParseSuccess"));
         return true;
@@ -3632,6 +3681,9 @@ class WebLyricsPlayer {
       ++this.lyricLoadId;
       if (!await this.loadLyricContent(input, "direct-input.txt")) return false;
       this.selectedLyricFile = null;
+      this.currentCaptions = null;
+      this.cancelLocalRestore();
+      this.localMemory.detach();
       this.updateFileInputDisplay("lyricFile", "Direct Input");
       this.showStatus(t("lyricsParseSuccess"));
       return true;
@@ -4370,6 +4422,9 @@ class WebLyricsPlayer {
   }
 
   private resetPlayer() {
+    this.cancelLocalRestore();
+    this.currentCaptions = null;
+    void this.localMemory.clear();
     ++this.musicLoadId;
     ++this.lyricLoadId;
     this.selectedMusicFile = null;
@@ -5389,6 +5444,114 @@ class WebLyricsPlayer {
 
     this.isInitialized = true;
     this.initAlbumCoverEffects();
+    this.setupLocalSession();
+  }
+
+  private setupLocalSession() {
+    document.getElementById('saveLocalSession')?.addEventListener('click', () => this.saveLocalSession());
+    document.getElementById('clearLocalSession')?.addEventListener('click', () => {
+      this.cancelLocalRestore();
+      ++this.musicLoadId;
+      ++this.lyricLoadId;
+      void this.localMemory.clear();
+    });
+    this.audio.addEventListener('timeupdate', () => this.rememberLocalProgress());
+    this.audio.addEventListener('pause', () => this.rememberLocalProgress(true));
+    this.audio.addEventListener('seeked', () => this.rememberLocalProgress(true));
+    window.addEventListener('pagehide', () => this.rememberLocalProgress(true));
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) this.rememberLocalProgress(true);
+    });
+    const params = new URLSearchParams(location.search);
+    if (params.has('music') || params.has('lyric')) this.localMemory.detach();
+    else this.localRestoreReady = this.restoreLocalSession();
+  }
+
+  private renderLocalSaveStatus(status: SaveStatus) {
+    const labels: Record<SaveStatus['phase'], string> = {
+      empty: '尚未保存', loading: '恢復中…', saving: '保存中…', saved: '已保存',
+      clearing: '清除中…', cleared: '已清除', error: '未完成', detached: '未保存目前內容',
+    };
+    const panel = document.getElementById('localSavePanel');
+    if (panel) panel.dataset.phase = status.phase;
+    const summary = document.getElementById('localSaveSummary');
+    if (summary) summary.textContent = `本機 · ${labels[status.phase]}`;
+    const detail = document.getElementById('localSaveStatus');
+    if (detail) detail.textContent = status.message;
+    const save = document.getElementById('saveLocalSession') as HTMLButtonElement | null;
+    if (save) save.disabled = !this.selectedMusicFile && !this.currentCaptions;
+  }
+
+  private saveLocalSession() {
+    const file = this.selectedMusicFile;
+    void this.localMemory.save(file ? { blob: file, name: file.name, type: file.type, lastModified: file.lastModified } : null,
+      this.currentCaptions, file ? this.audio.currentTime : 0, this.state.lyricDelay);
+  }
+
+  private rememberLocalProgress(flush = false) {
+    if (this.restoringLocal || !this.selectedMusicFile || !Number.isFinite(this.audio.duration)) return;
+    this.localMemory.updateProgress(this.audio.currentTime, this.state.lyricDelay, flush);
+  }
+
+  private cancelLocalRestore() {
+    ++this.restoreEpoch;
+    if (this.restoringLocal) {
+      ++this.musicLoadId;
+      ++this.lyricLoadId;
+      this.pendingMusicImport = null;
+    }
+    this.restoringLocal = false;
+  }
+
+  private clearCurrentCaptions() {
+    this.selectedLyricFile = null;
+    this.currentCaptions = null;
+    if (this.state.lyricUrl.startsWith('blob:')) URL.revokeObjectURL(this.state.lyricUrl);
+    this.state.lyricUrl = '';
+    this.hasLyrics = false;
+    this.originalLyricLines = [];
+    this.processedLyricLines = [];
+    this.lyricPlayer.setLyricLines([]);
+    this.updateFileInputDisplay('lyricFile', '');
+    this.updateLyricAreaHint();
+  }
+
+  private async restoreLocalSession() {
+    const epoch = ++this.restoreEpoch;
+    this.restoringLocal = true;
+    this.renderLocalSaveStatus({ phase: 'loading', message: '正在讀取上次的本機保存…' });
+    try {
+      const saved = await this.localMemory.read();
+      if (epoch !== this.restoreEpoch) return;
+      if (!saved) {
+        this.renderLocalSaveStatus({ phase: 'empty', message: '選入本機音訊或字幕後會自動保存。' });
+        return;
+      }
+      const { audio, captions } = saved.media;
+      if (audio) {
+        const file = new File([audio.blob], audio.name, { type: audio.type, lastModified: audio.lastModified });
+        const loaded = await this.loadMusicFromFile(file, true);
+        if (epoch !== this.restoreEpoch) return;
+        if (!loaded) throw new CorruptSessionError();
+      }
+      if (captions) {
+        const file = new File([captions.text], captions.name, { type: captions.type, lastModified: captions.lastModified });
+        const loaded = await this.loadLyricFromFile(file, true);
+        if (epoch !== this.restoreEpoch) return;
+        if (!loaded) throw new CorruptSessionError();
+      }
+      this.audio.pause();
+      this.applyLyricDelay(saved.progress.delay);
+      if (this.lyricDelayInput) this.lyricDelayInput.value = String(saved.progress.delay);
+      if (audio) this.seekAudio(saved.progress.position);
+      this.state.isPlaying = false;
+      this.updatePlayButton();
+      this.localMemory.adopt({ ...saved, progress: { ...saved.progress, position: audio ? this.audio.currentTime : 0 } });
+    } catch (error) {
+      if (epoch === this.restoreEpoch) this.localMemory.reportFailure(error);
+    } finally {
+      if (epoch === this.restoreEpoch) this.restoringLocal = false;
+    }
   }
 
   private startAnimationLoop() {
@@ -6077,6 +6240,7 @@ class WebLyricsPlayer {
 
   private applyLyricDelay(value: number) {
     this.state.lyricDelay = value;
+    this.rememberLocalProgress(true);
     this.pendingLyricDelay = value;
 
     if (!this.lyricPlayer) {

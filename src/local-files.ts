@@ -14,6 +14,25 @@ export function isCaptionFile(file: Pick<File, 'name' | 'type'>): boolean {
     || file.type === 'text/plain' || file.type === '';
 }
 
+export function waitForAudioMetadata(audio: HTMLAudioElement): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const finish = (error?: Error) => {
+      clearTimeout(timeout);
+      audio.removeEventListener('loadedmetadata', ready);
+      audio.removeEventListener('error', failed);
+      error ? reject(error) : resolve();
+    };
+    const ready = () => finish(Number.isFinite(audio.duration) && audio.duration > 0
+      ? undefined : new Error('Audio has no playable duration'));
+    const failed = () => finish(new Error('Audio cannot be decoded'));
+    const timeout = window.setTimeout(() => finish(new Error('Audio loading timed out')), 15000);
+    audio.addEventListener('loadedmetadata', ready);
+    audio.addEventListener('error', failed);
+    if (audio.error) failed();
+    else if (audio.readyState >= HTMLMediaElement.HAVE_METADATA) ready();
+  });
+}
+
 /** Validate locally without replacing the current track or uploading the file. */
 export async function createPlayableAudioUrl(file: File): Promise<string> {
   if (!file.size || !isAudioFile(file)) throw new Error('Unsupported or empty audio file');
@@ -25,22 +44,9 @@ export async function createPlayableAudioUrl(file: File): Promise<string> {
   const probe = document.createElement('audio');
   probe.preload = 'metadata';
   try {
-    await new Promise<void>((resolve, reject) => {
-      const finish = (error?: Error) => {
-        clearTimeout(timeout);
-        probe.onloadedmetadata = null;
-        probe.onerror = null;
-        error ? reject(error) : resolve();
-      };
-      const timeout = window.setTimeout(() => finish(new Error('Audio loading timed out')), 15000);
-      probe.onloadedmetadata = () => finish(
-        Number.isFinite(probe.duration) && probe.duration > 0
-          ? undefined : new Error('Audio has no playable duration'),
-      );
-      probe.onerror = () => finish(new Error('Audio cannot be decoded'));
-      probe.src = url;
-      probe.load();
-    });
+    probe.src = url;
+    probe.load();
+    await waitForAudioMetadata(probe);
     return url;
   } catch (error) {
     URL.revokeObjectURL(url);

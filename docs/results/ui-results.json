@@ -190,7 +190,7 @@
       {
         "selector": "#albumCoverContainer",
         "x": 36.20000076293945,
-        "y": 98.19999694824219,
+        "y": 128.1999969482422,
         "w": 57.60000228881836,
         "h": 57.600006103515625,
         "unobstructed": true
@@ -204,7 +204,7 @@
       "scroll": 768,
       "client": 768
     },
-    "mounted": 6,
+    "mounted": 5,
     "bodyWidth": 768,
     "portrait_spacing": {
       "headerClear": true,
@@ -213,7 +213,7 @@
     "mp3_lrc_single_double_tap_and_drag_seek": true,
     "drag_time_badge": {
       "x": 24,
-      "y": 522.703125,
+      "y": 537.703125,
       "w": 83.0625,
       "h": 32.296875,
       "bg": "rgba(39, 19, 38, 0.55)",
@@ -267,7 +267,7 @@
       {
         "selector": "#albumCoverContainer",
         "x": 36.20000076293945,
-        "y": 98.19999694824219,
+        "y": 128.1999969482422,
         "w": 57.60000228881836,
         "h": 57.600006103515625,
         "unobstructed": true
@@ -290,7 +290,7 @@
     "mp3_lrc_single_double_tap_and_drag_seek": true,
     "drag_time_badge": {
       "x": 24,
-      "y": 432.703125,
+      "y": 447.703125,
       "w": 83.0625,
       "h": 32.296875,
       "bg": "rgba(39, 19, 38, 0.55)",

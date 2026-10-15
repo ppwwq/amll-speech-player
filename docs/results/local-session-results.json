@@ -1,0 +1,33 @@
+{
+  "cases": {
+    "blob_and_captions_committed": true,
+    "refresh_restores_exact_blob_captions_offset_position_paused": true,
+    "playing_refresh_checkpoint_and_throttled_small_progress": {
+      "files": 0,
+      "progress": 2
+    },
+    "closed_browser_reopened_with_full_session": true,
+    "replacement_resets_position_and_does_not_pair_old_captions": true,
+    "quota_failure_atomicity_and_explicit_retry": true,
+    "progress_callback_write_failure_has_no_uncaught_error": true,
+    "request_success_followed_by_abort_is_not_saved": true,
+    "clear_wins_inflight_save_no_resurrection_on_seek_or_reload": true,
+    "caption_only_restore_then_first_audio_pair": true,
+    "simultaneous_audio_and_captions_pair": true,
+    "stale_caption_read_cannot_pair_with_new_audio": true,
+    "late_restore_read_cannot_override_manual_import": true,
+    "clear_failure_is_not_reported_as_cleared": true,
+    "corrupt_shape_shows_error_and_can_clear": true,
+    "corrupt_audio_shows_error_and_can_clear": true,
+    "corrupt_captions_shows_error_and_can_clear": true,
+    "storage_ui_desktop": true,
+    "storage_ui_tablet-landscape": true,
+    "storage_ui_tablet-portrait": true,
+    "storage_ui_phone": true,
+    "storage_ui_phone-landscape": true,
+    "unavailable_storage_does_not_break_manual_import_or_playback": true
+  },
+  "page_errors": [],
+  "non_read_requests": [],
+  "limits": "Chromium Linux and touch/viewport emulation; no physical iPad, Safari/WebKit, real disk exhaustion or OS eviction test."
+}

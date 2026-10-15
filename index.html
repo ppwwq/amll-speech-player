@@ -18,6 +18,17 @@
     #practiceToolbar button, #followPlayback { padding: 10px 15px; border: 1px solid #ffffff40; border-radius: 20px; background: #23111dcc; color: #fff; cursor: pointer; min-height: 44px; }
     #practiceToolbar a { color: #fff; margin-left: auto; }
     #practiceToolbar span { opacity: .75; }
+    #localSavePanel { position: fixed; top: max(58px, calc(env(safe-area-inset-top) + 48px)); right: 16px; z-index: 60; color: #fff; font-size: 12px; max-width: calc(100vw - 32px); }
+    #localSavePanel summary { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 12px; border: 1px solid #ffffff40; border-radius: 16px; background: #23111de8; cursor: pointer; list-style: none; }
+    #localSavePanel summary::-webkit-details-marker { display: none; }
+    #localSavePanel summary::after { content: '▾'; }
+    #localSavePanel[open] summary::after { content: '▴'; }
+    #localSavePanel[data-phase="error"] summary { border-color: #ffc3a8; }
+    #localSavePanel .save-details { position: absolute; top: 48px; right: 0; width: 300px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 170px); overflow-y: auto; box-sizing: border-box; padding: 14px; border: 1px solid #ffffff50; border-radius: 14px; background: #23111df5; box-shadow: 0 8px 30px #0006; line-height: 1.6; }
+    #localSavePanel p { margin: 0 0 12px; }
+    #localSavePanel .save-note { color: #e3d6df; font-size: 11px; }
+    #localSavePanel button { min-height: 44px; padding: 8px 12px; margin: 2px 4px 2px 0; border: 1px solid #ffffff50; border-radius: 10px; background: #ffffff18; color: #fff; cursor: pointer; }
+    #localSavePanel button:disabled { opacity: .45; cursor: default; }
     #followPlayback { position: absolute; bottom: 45px; right: 24px; z-index: 40; }
     #followPlayback[hidden] { display: none; }
     .speech-lyrics { overscroll-behavior: contain; user-select: none; -webkit-user-select: none; }
@@ -124,8 +135,8 @@
 
     #controlPanel {
       position: fixed;
-      top: 28px;
-      max-height: calc(100vh - 40px);
+      top: 112px;
+      max-height: calc(100vh - 124px);
       bottom: 70px;
       right: -50px;
       border-radius: 24px;
@@ -580,7 +591,7 @@
     @media (max-width: 768px) and (orientation: portrait) {
       #albumSidePanel {
         display: block;
-        top: 82px;
+        top: 112px;
         left: 20px;
         right: 20px;
         z-index: 40;
@@ -641,7 +652,7 @@
       #lyricsPanel {
         z-index: 30;
         position: absolute !important;
-        top: 178px;
+        top: 208px;
         bottom: 76px;
         width: 100%;
         height: auto;
@@ -1206,6 +1217,15 @@
     <span id="practiceHint">單點播放／暫停 · 雙點跳播</span>
     <a href="./source/amll-speech-player.tar.gz" download>Source · AGPL-3.0</a>
   </nav>
+  <details id="localSavePanel" data-phase="loading">
+    <summary title="本機保存選項"><span id="localSaveSummary" aria-live="polite">本機 · 讀取中…</span></summary>
+    <div class="save-details">
+      <p id="localSaveStatus" role="status" aria-live="polite">正在讀取上次的本機保存…</p>
+      <p class="save-note">音訊與字幕只保存在此瀏覽器，不會上傳。空間不足、清除網站資料或久未使用時，瀏覽器可能移除保存，請保留原檔。</p>
+      <button id="saveLocalSession" type="button">保存目前檔案／重試</button>
+      <button id="clearLocalSession" type="button">清除保存檔案</button>
+    </div>
+  </details>
   <div id="player">
     <div id="albumSidePanel">
       <div class="song-info-container">
