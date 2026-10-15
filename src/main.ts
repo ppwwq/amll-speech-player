@@ -23,6 +23,7 @@ import { isAssFormat, parseAss, assToTTML } from "./lyric/ass-parser";
 import { isLqeFormat, parseLqe, lqeToTTML } from "./lyric/lqe-parser";
 import { isLylFormat, parseLyl, lylToTTML } from "./lyric/lyl-parser";
 import { isSrtFormat, parseSrt, srtToTTML } from "./lyric/srt-parser";
+import { normalizeLrcTimings } from "./lyric/lrc-timing";
 
 // 导入测试脚本（仅在开发环境中使用）
 import { getCurrentLanguage, getTranslations, t } from "./i18n";
@@ -3681,7 +3682,7 @@ class WebLyricsPlayer {
           const ttmlContent = parseSPL(content);
           lines = parseTTML(ttmlContent).lines.map(this.mapTTMLLyric);
         } else {
-          lines = parseLrc(content).map(this.mapLyric);
+          lines = normalizeLrcTimings(parseLrc(content)).map(this.mapLyric);
         }
       } else if (filename.endsWith(".yrc")) {
         lines = parseYrc(content).map(this.mapLyric);
@@ -3733,7 +3734,7 @@ class WebLyricsPlayer {
           const ttmlContent = lylToTTML(content);
           lines = parseTTML(ttmlContent).lines.map(this.mapTTMLLyric);
         } else {
-          lines = parseLrc(content).map(this.mapLyric);
+          lines = normalizeLrcTimings(parseLrc(content)).map(this.mapLyric);
         }
       }
 

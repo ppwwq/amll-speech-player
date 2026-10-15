@@ -1,0 +1,312 @@
+{
+  "url": "http://127.0.0.1:4173/",
+  "browser": "Chromium (no Safari)",
+  "cases": {
+    "desktop_rapid_bidirectional": [
+      {
+        "time": 42,
+        "hot": [
+          14
+        ],
+        "mounted": 8
+      },
+      {
+        "time": 3,
+        "hot": [
+          1
+        ],
+        "mounted": 6
+      },
+      {
+        "time": 48,
+        "hot": [
+          16
+        ],
+        "mounted": 7
+      },
+      {
+        "time": 6,
+        "hot": [
+          2
+        ],
+        "mounted": 7
+      },
+      {
+        "time": 54,
+        "hot": [
+          18
+        ],
+        "mounted": 5
+      },
+      {
+        "time": 0,
+        "hot": [
+          0
+        ],
+        "mounted": 5
+      },
+      {
+        "time": 30,
+        "hot": [
+          10
+        ],
+        "mounted": 8
+      },
+      {
+        "time": 3,
+        "hot": [
+          1
+        ],
+        "mounted": 6
+      },
+      {
+        "time": 57,
+        "hot": [
+          19
+        ],
+        "mounted": 4
+      },
+      {
+        "time": 0,
+        "hot": [
+          0
+        ],
+        "mounted": 5
+      }
+    ],
+    "desktop_playing_bidirectional": true,
+    "desktop_forced_reset_clears_old_target": true,
+    "desktop_unordered_duplicates_delay_boundaries": true,
+    "desktop_input_and_manual_hold": true,
+    "landscape_rapid_bidirectional": [
+      {
+        "time": 42,
+        "hot": [
+          14
+        ],
+        "mounted": 8
+      },
+      {
+        "time": 3,
+        "hot": [
+          1
+        ],
+        "mounted": 6
+      },
+      {
+        "time": 48,
+        "hot": [
+          16
+        ],
+        "mounted": 7
+      },
+      {
+        "time": 6,
+        "hot": [
+          2
+        ],
+        "mounted": 7
+      },
+      {
+        "time": 54,
+        "hot": [
+          18
+        ],
+        "mounted": 5
+      },
+      {
+        "time": 0,
+        "hot": [
+          0
+        ],
+        "mounted": 5
+      },
+      {
+        "time": 30,
+        "hot": [
+          10
+        ],
+        "mounted": 8
+      },
+      {
+        "time": 3,
+        "hot": [
+          1
+        ],
+        "mounted": 6
+      },
+      {
+        "time": 57,
+        "hot": [
+          19
+        ],
+        "mounted": 4
+      },
+      {
+        "time": 0,
+        "hot": [
+          0
+        ],
+        "mounted": 5
+      }
+    ],
+    "landscape_playing_bidirectional": true,
+    "landscape_forced_reset_clears_old_target": true,
+    "landscape_unordered_duplicates_delay_boundaries": true,
+    "landscape_input_and_manual_hold": true,
+    "portrait_rapid_bidirectional": [
+      {
+        "time": 42,
+        "hot": [
+          14
+        ],
+        "mounted": 8
+      },
+      {
+        "time": 3,
+        "hot": [
+          1
+        ],
+        "mounted": 5
+      },
+      {
+        "time": 48,
+        "hot": [
+          16
+        ],
+        "mounted": 7
+      },
+      {
+        "time": 6,
+        "hot": [
+          2
+        ],
+        "mounted": 7
+      },
+      {
+        "time": 54,
+        "hot": [
+          18
+        ],
+        "mounted": 5
+      },
+      {
+        "time": 0,
+        "hot": [
+          0
+        ],
+        "mounted": 5
+      },
+      {
+        "time": 30,
+        "hot": [
+          10
+        ],
+        "mounted": 8
+      },
+      {
+        "time": 3,
+        "hot": [
+          1
+        ],
+        "mounted": 6
+      },
+      {
+        "time": 57,
+        "hot": [
+          19
+        ],
+        "mounted": 4
+      },
+      {
+        "time": 0,
+        "hot": [
+          0
+        ],
+        "mounted": 5
+      }
+    ],
+    "portrait_playing_bidirectional": true,
+    "portrait_forced_reset_clears_old_target": true,
+    "portrait_unordered_duplicates_delay_boundaries": true,
+    "portrait_input_and_manual_hold": true,
+    "narrow_rapid_bidirectional": [
+      {
+        "time": 42,
+        "hot": [
+          14
+        ],
+        "mounted": 6
+      },
+      {
+        "time": 3,
+        "hot": [
+          1
+        ],
+        "mounted": 5
+      },
+      {
+        "time": 48,
+        "hot": [
+          16
+        ],
+        "mounted": 6
+      },
+      {
+        "time": 6,
+        "hot": [
+          2
+        ],
+        "mounted": 6
+      },
+      {
+        "time": 54,
+        "hot": [
+          18
+        ],
+        "mounted": 4
+      },
+      {
+        "time": 0,
+        "hot": [
+          0
+        ],
+        "mounted": 4
+      },
+      {
+        "time": 30,
+        "hot": [
+          10
+        ],
+        "mounted": 6
+      },
+      {
+        "time": 3,
+        "hot": [
+          1
+        ],
+        "mounted": 5
+      },
+      {
+        "time": 57,
+        "hot": [
+          19
+        ],
+        "mounted": 3
+      },
+      {
+        "time": 0,
+        "hot": [
+          0
+        ],
+        "mounted": 4
+      }
+    ],
+    "narrow_playing_bidirectional": true,
+    "narrow_forced_reset_clears_old_target": true,
+    "narrow_unordered_duplicates_delay_boundaries": true,
+    "narrow_input_and_manual_hold": true
+  },
+  "page_errors": [],
+  "failures": []
+}

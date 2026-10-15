@@ -97,7 +97,10 @@ export function isSPLFormat(content: string): boolean {
   const sampleLines = lines.slice(0, Math.min(5, lines.length));
   return sampleLines.some((line) => {
     const lineRegex = /^((\[\d{1,3}:\d{1,2}(?:\.\d{1,6})?\])+)(.*)$/;
-    return lineRegex.test(line.trim());
+    const match = line.trim().match(lineRegex);
+    // Leading LRC timestamps (including repeated-line labels) are not word
+    // timings. Only route to SPL when the remaining text has inline timing.
+    return !!match && /[<\[]\d{1,3}:\d{1,2}(?:\.\d{1,6})?[>\]]/.test(match[3]);
   });
 }
 

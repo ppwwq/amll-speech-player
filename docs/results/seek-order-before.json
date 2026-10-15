@@ -1,0 +1,111 @@
+{
+  "baseline_commit": "a2d9d5cee4a9b167858b19ec60c4844c6bcf929e",
+  "browser": "Chromium Linux, desktop/tablet/narrow emulation, not Safari",
+  "failed_groups": [
+    "desktop_rapid_bidirectional",
+    "desktop_forced_reset_clears_old_target",
+    "desktop_unordered_duplicates_delay_boundaries",
+    "desktop_input_and_manual_hold",
+    "landscape_rapid_bidirectional",
+    "landscape_forced_reset_clears_old_target",
+    "landscape_unordered_duplicates_delay_boundaries",
+    "landscape_input_and_manual_hold",
+    "portrait_rapid_bidirectional",
+    "portrait_forced_reset_clears_old_target",
+    "portrait_unordered_duplicates_delay_boundaries",
+    "portrait_input_and_manual_hold",
+    "narrow_rapid_bidirectional",
+    "narrow_forced_reset_clears_old_target",
+    "narrow_unordered_duplicates_delay_boundaries",
+    "narrow_input_and_manual_hold"
+  ],
+  "passed_groups": [],
+  "page_errors": [],
+  "persistent_positions_after_1200ms": [
+    {
+      "i": 0,
+      "start": 0,
+      "end": 3000,
+      "target": 122.70000000000005,
+      "pos": 122.70000000000005,
+      "queue": null,
+      "mounted": true,
+      "active": false,
+      "animated": true
+    },
+    {
+      "i": 1,
+      "start": 3000,
+      "end": 6000,
+      "target": 245.70000000000005,
+      "pos": 245.70000000000005,
+      "queue": null,
+      "mounted": true,
+      "active": true,
+      "animated": true
+    },
+    {
+      "i": 2,
+      "start": 6000,
+      "end": 9000,
+      "target": 368.70000000000005,
+      "pos": 368.70000000000005,
+      "queue": null,
+      "mounted": true,
+      "active": false,
+      "animated": true
+    },
+    {
+      "i": 3,
+      "start": 9000,
+      "end": 12000,
+      "target": 491.70000000000005,
+      "pos": 614.6646446943233,
+      "queue": null,
+      "mounted": true,
+      "active": false,
+      "animated": true
+    },
+    {
+      "i": 4,
+      "start": 12000,
+      "end": 15000,
+      "target": 614.7,
+      "pos": 737.6585225329841,
+      "queue": null,
+      "mounted": true,
+      "active": false,
+      "animated": true
+    },
+    {
+      "i": 5,
+      "start": 15000,
+      "end": 18000,
+      "target": 737.7,
+      "pos": 736.8339489729048,
+      "queue": null,
+      "mounted": true,
+      "active": false,
+      "animated": true
+    },
+    {
+      "i": 6,
+      "start": 18000,
+      "end": 21000,
+      "target": 860.7,
+      "pos": 860.7,
+      "queue": null,
+      "mounted": true,
+      "active": false,
+      "animated": true
+    }
+  ],
+  "first_spring_failure": {
+    "case": "desktop_forced_reset_clears_old_target",
+    "detail": "('stale transform', [{'i': 0, 'start': 0, 'end': 3000, 'text': 'Synthetic line 00. Read this deliberately long sentence clearly and slowly.', 'target': 67.5, 'pos': 67.5, 'queue': None, 'mounted': True, 'y': 72.5, 'height': 194.578125, 'active': False, 'animated': True}, {'i': 1, 'start': 3000, 'end': 6000, 'text': 'Synthetic line 01. Read this deliberately long sentence clearly and slowly.', 'target': 262.5, 'pos': 262.50679195461805, 'queue': None, 'mounted': True, 'y': 267.5, 'height': 194.578125, 'active': True, 'animated': True}, {'i': 2, 'start': 6000, 'end': 9000, 'text': 'Synthetic line 02. Read this deliberately long sentence clearly and slowly.', 'target': 457.5, 'pos': 662.7769556162016, 'queue': None, 'mounted': True, 'y': 667.7999877929688, 'height': 194.578125, 'active': False, 'animated': True}, {'i': 3, 'start': 9000, 'end': 12000, 'text': 'Synthetic line 03. Read this deliberately long sentence clearly and slowly.', 'target': 652.5, 'pos': 652.506793947668, 'queue': None, 'mounted': True, 'y': 657.5, 'height': 194.578125, 'active': False, 'animated': True}, {'i': 4, 'start': 12000, 'end': 15000, 'text': 'Synthetic line 04. Read this deliberately long sentence clearly and slowly.', 'target': 847.5, 'pos': 847.5067949441931, 'queue': None, 'mounted': True, 'y': 852.5, 'height': 194.578125, 'active': False, 'animated': True}, {'i': 5, 'start': 15000, 'end': 18000, 'text': 'Synthetic line 05. Read this deliberately long sentence clearly and slowly.', 'target': 1042.5, 'pos': 1042.5, 'queue': None, 'mounted': True, 'y': 1047.5, 'height': 194.578125, 'active': False, 'animated': True}])"
+  },
+  "unordered_input_failure": {
+    "case": "desktop_unordered_duplicates_delay_boundaries",
+    "detail": "{'time': 3000, 'anchor': 0, 'hot': [0], 'lines': [{'i': 0, 'start': 0, 'end': 6000, 'text': 'Zero', 'target': 313.5, 'pos': 311.19128666766613, 'queue': None, 'mounted': True, 'y': 316.20001220703125, 'height': 93.046875, 'active': False, 'animated': True}, {'i': 1, 'start': 3000, 'end': 3000, 'text': 'Three A', 'target': 406.5, 'pos': 404.2774119440757, 'queue': None, 'mounted': True, 'y': 409.29998779296875, 'height': 93.046875, 'active': False, 'animated': True}, {'i': 2, 'start': 3000, 'end': 3000, 'text': 'Three B', 'target': 499.5, 'pos': 497.3635372204853, 'queue': None, 'mounted': True, 'y': 502.4000244140625, 'height': 93.046875, 'active': False, 'animated': True}, {'i': 3, 'start': 6000, 'end': 15000, 'text': 'Repeat', 'target': 592.5, 'pos': 590.4496624968949, 'queue': None, 'mounted': True, 'y': 595.4000244140625, 'height': 93.046875, 'active': False, 'animated': True}, {'i': 4, 'start': 9000, 'end': 3000, 'text': 'Nine', 'target': 685.5, 'pos': 683.5357877733047, 'queue': None, 'mounted': True, 'y': 688.5, 'height': 93.046875, 'active': False, 'animated': True}, {'i': 5, 'start': 15000, 'end': 20000, 'text': 'Last', 'target': 778.5, 'pos': 778.5, 'queue': None, 'mounted': True, 'y': 783.5, 'height': 93.046875, 'active': False, 'animated': True}]}"
+  }
+}

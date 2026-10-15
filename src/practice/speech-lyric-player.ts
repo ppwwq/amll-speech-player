@@ -2,6 +2,11 @@ import { DomLyricPlayer, type LyricLine } from '@applemusic-like-lyrics/core';
 import { TapGesture, DoubleTapGesture, dragSeekTime } from './timing';
 
 type Line = DomLyricPlayer['currentLyricLineObjects'][number];
+// Runtime fields of pinned alpha.5, omitted from its declarations by @internal.
+type LineSprings = { lineTransforms: {
+  posY: { setTargetPosition(position: number): void };
+  scale: { setTargetPosition(position: number): void };
+} };
 type DragPointer = {
   id: number; y: number; time: number; velocity: number; line?: Line;
   startX: number; startY: number; startedAt: number; dragging: boolean;
@@ -19,6 +24,7 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
   private inertia = 0;
   private layoutFrame = 0;
   private syncLayout = false;
+  private snapLayout = false;
   private pointer: DragPointer | null = null;
   private dragSeekEnabled = true;
   private seekDuration = NaN;
@@ -302,6 +308,9 @@ ${text}`;
     super.setCurrentTime(Math.round(time), isSeek);
     for (const index of this.hotLines) {
       const line = this.currentLyricLineObjects[index];
+      // Core can retain a hot index while replacing the DOM row on import.
+      // Also reset same-row word animations when seeking within its interval.
+      if (isSeek) void line?.enable(time);
       line?.setMaskAnimationState(time);
       if (!this.isPlaying) void line?.pause();
     }
@@ -310,7 +319,10 @@ ${text}`;
       const next = this.processedLines.findIndex(line => line.startTime >= time);
       this.scrollToIndex = this.hotLines.size ? Math.min(...this.hotLines)
         : next >= 0 ? next : Math.max(0, this.processedLines.length - 1);
-      void this.calcLayout();
+      // A discontinuous clock must not mix old visible springs with newly
+      // mounted rows already placed at the destination. Batch one atomic layout.
+      this.snapLayout = true;
+      void this.calcLayout(true);
     }
   }
 
@@ -321,6 +333,7 @@ ${text}`;
     void super.calcLayout(this.syncLayout);
     this.scrollToIndex = currentAnchor;
     this.syncLayout = false;
+    this.snapLayout = false;
     // Unlike browsing, scrubbing must be able to centre both the first and last sentence.
     if (this.firstMainLine && this.lastMainLine) {
       const offsetFor = (line: Line) => (this.targetTop.get(line) ?? 0) + this.scrollOffset +
@@ -333,6 +346,9 @@ ${text}`;
 
   override async calcLayout(sync = false) {
     this.syncLayout ||= sync;
+    // ResizeObserver measures newly mounted wrapped rows after a seek. Their
+    // corrected heights belong to the same snapped layout, not a new animation.
+    this.snapLayout ||= sync;
     if (this.layoutFrame) return;
     this.layoutFrame = requestAnimationFrame(() => this.renderLayout());
   }
@@ -351,24 +367,37 @@ ${text}`;
       el.setAttribute('role', 'button'); el.tabIndex = 0;
       el.setAttribute('aria-label', `Seek to ${line.getLine().words.map(w => w.word).join('')}`);
       const transform = line.setTransform.bind(line);
+      const resetSprings = (top: number, scale: number) => {
+        // alpha.5 setPosition() leaves queuePosition alive. Clear its delayed
+        // target through the spring API before the forced transform resets velocity.
+        const springs = (line as Line & LineSprings).lineTransforms;
+        springs.posY.setTargetPosition(top);
+        springs.scale.setTargetPosition(scale);
+      };
       let parked = false;
       line.setTransform = (top = 0, scale = 100, opacity = 1, blur = 0, force = false, delay = 0) => {
         const height = this.lyricLinesSize.get(line)?.[1] ?? this.size[1] / 5;
         const near = top < this.size[1] + height && top + height > -height;
         this.targetTop.set(line, top);
-        if (!near && (parked || !line.isInSight)) {
-          if (!parked) { transform(top, scale, opacity, 0, true, 0); line.hide(); }
+        if (!near && (this.snapLayout || parked || !line.isInSight)) {
+          if (!parked) { resetSprings(top, scale); transform(top, scale, opacity, 0, true, 0); line.hide(); }
           parked = true;
           this.animated.delete(line);
           return; // No style writes or springs for distant detached lines.
         }
-        transform(top, scale, opacity, this.manual ? 0 : Math.min(4, blur), force || parked || this.manual, this.manual ? 0 : delay);
+        // Rows retired by update() also need a reset when they re-enter.
+        const snap = force || parked || !this.animated.has(line) || this.manual || this.snapLayout;
+        if (snap) resetSprings(top, scale);
+        transform(top, scale, opacity, this.manual ? 0 : Math.min(4, blur), snap, snap ? 0 : delay);
         parked = false;
         this.animated.add(line);
         if (near) line.show();
       };
     }
-    void this.calcLayout(true);
+    // Core's base import visits the old row objects before DOM creates new ones.
+    this.hotLines.clear();
+    this.bufferedLines.clear();
+    this.setCurrentTime(initialTime, true);
   }
 
   override update(delta = 0) {

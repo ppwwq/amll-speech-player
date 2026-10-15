@@ -84,3 +84,22 @@ Test environment: Node 24.19.0, pnpm 11.25.0 supplied by the cloud environment, 
 All three final production browser suites passed with zero page errors; raw results are in `docs/results/browser-results.json`, `drag-seek-results.json` and `ui-results.json`. It exercised 2000 parsed SRT sentences with five mounted/animated rows at the sampled position. Per-update p95 was 0.1ms in that run. Initial 2000-line import took about 12.0 seconds in the container, including parsing/creation/layout; this remains a startup cost and is not claimed to be fixed by steady-state culling. Typical shorter transcripts and actual iPad initial load time still need device measurement.
 
 The raw before/after comparison, including verified touch hit target and manual state, is in `docs/results/comparison.json`.
+
+## Seek-order repair validation — 2026-10-15
+
+This section supersedes the historical publication/access limitations above for this follow-up. The existing repository is `ppwwq/amll-speech-player`, with production at https://amll-speech-player.vercel.app/; no new repository or Vercel project is used. Research, exact causes and candidate-library decisions are in [SEEK_REPAIR.md](SEEK_REPAIR.md).
+
+The initial 16 seek-order regression groups fail on published baseline `a2d9d5c` (raw excerpts in `docs/results/seek-order-before.json`). The final expanded suite passes **20/20** groups on the production build, including actual mouse/CDP touch, paused/playing synthetic MP3, ordered/unsorted/repeated LRC times, wrapped lines, both delay signs, start/end boundaries, repeated forward/backward seeks, double activation, drag release and manual anchor preservation. Positions, active classes, mount state and stale spring targets are asserted in addition to audio time.
+
+Final local checks:
+
+- `tsc --noEmit`: passed.
+- `node --experimental-strip-types --test tests/*.test.ts`: 8 groups passed.
+- `node scripts/package-source.mjs && vite build`: passed. Existing classic metadata-script and >500KB bundle warnings remain; generated JS is `assets/index-B9ivb_wZ.js`.
+- Against `http://127.0.0.1:4173/`: `tests/browser.py`, `tests/drag_seek.py`, `tests/ui_checks.py`, and `tests/seek_order.py` all passed, with zero page errors. Four UI sizes were checked; desktop, portrait and narrow screenshots were visually reviewed.
+- 2000-line sample: 5 mounted/animated rows, update p95 about 0.1ms, manual anchor delta 0px. These are container JavaScript timings, not device FPS or battery claims.
+- Raw current results are in `docs/results/{browser,drag-seek,ui,seek-order}-results.json`. Generated synthetic audio/screenshots stay in ignored `test-results/`.
+
+The existing Vercel project was identified as `prj_ep1uPLZbO9uJrP1wzqWkFujn7V1s`. Project basics are readable; its detailed deployment API returned 403 for the existing account scope, and no Vercel CLI is installed. No credential or permission change was attempted. GitHub Vercel commit status and public asset/browser checks are the available post-push verification route; their final outcome is reported with the delivery commit.
+
+Still unverified: physical iPad, Safari/WebKit, the user's unprovided video/LRC, audio hardware latency and unbounded transcript size. Only synthetic audio/LRC was used. The pinned-core internal API dependency remains documented; this patch does not upgrade packages.
