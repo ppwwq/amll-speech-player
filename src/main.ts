@@ -4851,19 +4851,9 @@ class WebLyricsPlayer {
   }
 
   private adjustLyricPosition() {
-    const lyricElement = this.lyricPlayer.getElement();
-    if (lyricElement) {
-      const isLandscape = window.matchMedia(
-        "(min-width: 769px), (orientation: landscape)"
-      ).matches;
-
-      if (isLandscape) {
-        lyricElement.style.paddingTop = "20px";
-      } else {
-        lyricElement.style.paddingTop = "120px";
-      }
-      this.updateLyricAreaHint();
-    }
+    // CSS reserves the toolbar area for both orientations. Extra padding here
+    // would change the renderer's measured height and the drag guide position.
+    this.updateLyricAreaHint();
   }
 
   private updateAlbumSidePanel() {

@@ -14,12 +14,12 @@
   <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
   <link rel="apple-touch-icon" href="%BASE_URL%icons/icon-192x192.png" />
   <style>
-    #practiceToolbar { position: fixed; inset: max(10px, env(safe-area-inset-top)) 16px auto; z-index: 48; display: flex; gap: 10px; align-items: center; color: #fff; font-size: 12px; }
+    #practiceToolbar { position: fixed; inset: var(--practice-top) 16px auto; z-index: 48; display: flex; gap: 10px; align-items: center; color: #fff; font-size: 12px; }
     #practiceToolbar button { padding: 10px 15px; border-radius: 20px; cursor: pointer; min-height: 44px; }
     #followPlayback { padding: 10px 15px; border: 1px solid #ffffff40; border-radius: 20px; background: #23111dcc; color: #fff; cursor: pointer; min-height: 44px; }
     #practiceToolbar a { color: #fff; margin-left: auto; }
     #practiceToolbar span { opacity: .75; }
-    #localSavePanel { position: fixed; top: max(58px, calc(env(safe-area-inset-top) + 48px)); right: 16px; z-index: 60; color: var(--dominant-color-light); font-size: 12px; max-width: calc(100vw - 32px); }
+    #localSavePanel { position: fixed; top: calc(var(--practice-top) + 48px); right: 16px; z-index: 60; color: var(--dominant-color-light); font-size: 12px; max-width: calc(100vw - 32px); }
     #localSavePanel summary { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 12px; border-radius: 16px; cursor: pointer; list-style: none; }
     #localSavePanel summary::-webkit-details-marker { display: none; }
     #localSavePanel summary::after { content: '▾'; }
@@ -77,7 +77,7 @@
     /* Use AMLL's word-mask variables for preview brightness without starting
        playback/word animations. Its own scale spring handles the enlargement. */
     .speech-lyrics [data-drag-candidate] { --bright-mask-alpha: 1 !important; --dark-mask-alpha: 1 !important; }
-    @media (max-width: 1100px) { #practiceToolbar strong { display: none; } #practiceHint { position: fixed; top: 61px; left: 18px; font-size: 11px; } }
+    @media (max-width: 1100px) { #practiceToolbar strong { display: none; } #practiceHint { position: fixed; top: calc(var(--practice-top) + 51px); left: 18px; font-size: 11px; } }
     @media (max-width: 600px) { #practiceToolbar { gap: 5px; inset-inline: 8px; } #practiceToolbar button { padding-inline: 10px; } #practiceToolbar a { max-width: 60px; font-size: 10px; } }
     .speech-lyrics.manual-scroll [role="button"] { transition: none !important; }
     .speech-lyrics [role="button"] { overflow-wrap: anywhere; }
@@ -86,6 +86,9 @@
     @media (prefers-reduced-motion: reduce) { .speech-lyrics [role="button"] { transition: none !important; } }
 
     :root {
+      --practice-top: max(10px, env(safe-area-inset-top));
+      /* Reserve both toolbar rows without painting an overlay over the lyrics. */
+      --practice-content-top: calc(var(--practice-top) + 102px);
       --app-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       font-family: var(--app-font-family);
       --dominant-color: rgb(253, 156, 155);
@@ -181,8 +184,8 @@
 
     #controlPanel {
       position: fixed;
-      top: 112px;
-      max-height: calc(100vh - 124px);
+      top: var(--practice-content-top);
+      max-height: calc(100vh - var(--practice-content-top) - 12px);
       bottom: 70px;
       right: -50px;
       border-radius: 24px;
@@ -470,8 +473,8 @@
     }
 
     .amll-lyric-player {
-      margin-top: -15px !important;
-      padding-top: 15px !important;
+      margin-top: 0 !important;
+      padding-top: 0 !important;
     }
 
     .flex-group {
@@ -625,19 +628,16 @@
       #lyricsPanel {
         z-index: 30;
         width: 60%;
-        height: 100vh;
+        margin-top: var(--practice-content-top);
+        height: calc(100% - var(--practice-content-top));
         position: relative;
-      }
-
-      .amll-lyric-player {
-        padding-top: 20px !important;
       }
     }
 
     @media (max-width: 768px) and (orientation: portrait) {
       #albumSidePanel {
         display: block;
-        top: 112px;
+        top: var(--practice-content-top);
         left: 20px;
         right: 20px;
         z-index: 40;
@@ -698,7 +698,7 @@
       #lyricsPanel {
         z-index: 30;
         position: absolute !important;
-        top: 208px;
+        top: calc(var(--practice-content-top) + 96px);
         bottom: 76px;
         width: 100%;
         height: auto;
@@ -706,13 +706,11 @@
 
       .speech-lyrics {
         --amll-lp-font-size: clamp(28px, 5vw, 42px);
-        margin-top: 0 !important;
-        padding-top: 0 !important;
       }
 
       #controlPanel {
-        top: 180px;
-        max-height: calc(100vh - 190px);
+        top: calc(var(--practice-content-top) + 68px);
+        max-height: calc(100vh - var(--practice-content-top) - 78px);
       }
 
       [style*="display: flex; gap: 10px;"] {
