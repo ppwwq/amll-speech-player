@@ -1,5 +1,5 @@
 import { DomLyricPlayer, type LyricLine } from '@applemusic-like-lyrics/core';
-import { TapGesture, DoubleTapGesture, DOUBLE_TAP_WINDOW_MS, dragSeekTime } from './timing';
+import { TapGesture, DoubleTapGesture, DOUBLE_TAP_WINDOW_MS, dragSeekTime, dragSelectionIndex } from './timing';
 
 type Line = DomLyricPlayer['currentLyricLineObjects'][number];
 // Runtime fields of pinned alpha.5, omitted from its declarations by @internal.
@@ -135,17 +135,19 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
     const p = this.pointer;
     if (!p?.dragging || !p.seek) return;
     this.dragGuide.hidden = false;
-    let nearest: Line | null = null;
-    let distance = Infinity;
-    // Layout positions and measured sizes are already cached by AMLL. No DOM reads per move.
+    const rows: { line: Line; top: number; height: number }[] = [];
+    // AMLL's cached unscaled boxes stay stable while the preview spring grows.
+    // No DOM measurements per move; detached/re-entering rows need visual order,
+    // not the insertion order of the animated set.
     for (const line of this.animated) {
       if (line.getLine().isBG || !line.getLine().words.some(word => word.word.trim())) continue;
       const top = this.targetTop.get(line);
       const height = this.lyricLinesSize.get(line)?.[1];
       if (top === undefined || !height) continue;
-      const d = Math.abs(top + height / 2 - this.size[1] / 2);
-      if (d < distance) { nearest = line; distance = d; }
+      rows.push({ line, top, height });
     }
+    rows.sort((a, b) => a.top - b.top);
+    const nearest = rows[dragSelectionIndex(rows, this.size[1] / 2)]?.line;
     const seconds = nearest ? dragSeekTime(nearest.getLine().startTime, this.lyricDelayMs, this.seekDuration) : null;
     this.dragCandidate = p.inside && nearest && seconds !== null ? { line: nearest, seconds } : null;
     this.setPreviewLine(this.dragCandidate?.line ?? null);
@@ -257,7 +259,8 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
     this.hideDragPreview();
     if (selected) {
       this.cancelTap();
-      this.activate(selected); // Exactly one commit; never run inertia in seek mode.
+      // Commit even when this is the current sentence: replay its start once.
+      this.activate(selected); // Never run inertia or a pending single tap here.
     } else if (this.gesture.isTap(e.timeStamp) && p.inside) {
       if (this.doubleTap.accept(p.line ?? this.element, e.clientX, e.clientY, e.timeStamp)) {
         this.cancelTap();

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { audioTimeSeconds, lyricTimeMs, clampSeek, TapGesture, DoubleTapGesture, DOUBLE_TAP_WINDOW_MS, dragSeekTime } from '../src/practice/timing.ts';
+import { audioTimeSeconds, lyricTimeMs, clampSeek, TapGesture, DoubleTapGesture, DOUBLE_TAP_WINDOW_MS, dragSeekTime, dragSelectionIndex } from '../src/practice/timing.ts';
 
 test('milliseconds/seconds round trip with positive and negative subtitle offset', () => {
   for (const delay of [-1500, 0, 1250]) for (const start of [0, 1234, 62000, 3600000]) {
@@ -53,4 +53,17 @@ test('double-tap window boundary and cancellation match delayed single-tap arbit
   assert.equal(g.accept('line', 0, 0, 1000 + DOUBLE_TAP_WINDOW_MS + 1), false);
   g.reset();
   assert.equal(g.accept('line', 0, 0, 1400), false);
+});
+
+test('drag regions divide the gap between unequal-height rows, with deterministic boundaries', () => {
+  const rows = [{ top: 0, height: 200 }, { top: 240, height: 40 }, { top: 300, height: 160 }];
+  // A tall sentence retains its bottom lines even though the short neighbour's
+  // centre is closer. The 40px and 20px gaps split at 220px and 290px.
+  for (const y of [-10, 0, 100, 190, 200, 219.99]) assert.equal(dragSelectionIndex(rows, y), 0);
+  for (const y of [220, 220.01, 240, 280, 289.99]) assert.equal(dragSelectionIndex(rows, y), 1);
+  for (const y of [290, 300, 460, 999]) assert.equal(dragSelectionIndex(rows, y), 2);
+  assert.equal(dragSelectionIndex([], 0), -1);
+  assert.equal(dragSelectionIndex([{ top: 0, height: 40 }], 100), 0);
+  // Whole-layout translation preserves the selected sentence.
+  assert.equal(dragSelectionIndex(rows.map(r => ({ ...r, top: r.top - 137 })), 219 - 137), 0);
 });

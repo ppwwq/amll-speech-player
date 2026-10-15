@@ -18,6 +18,8 @@ The transcript stays below the top control rows in both orientations, including 
 
 **Drag to seek is on by default.** Drag the transcript vertically, align a sentence with the centre guide and release: audio seeks once to the shown time. A compact translucent badge shows only the target audio time (`mm:ss.mmm`), with no instruction or sentence text. Invalid candidates show no time badge. During the drag, playback continues and the candidate preview does not seek. Release outside the transcript to cancel. The **拖動跳播：開／關** switch turns this into ordinary inertial browsing and remembers your preference. The mouse wheel always browses. Single and double taps work in either mode.
 
+The midpoint of the space between adjacent sentences separates their drag-selection regions, including wrapped sentences. Releasing on the current sentence replays it from the beginning; you do not need to select another sentence first. Playing audio keeps playing, and paused audio stays paused. This does not enable automatic looping. See [same-sentence replay and boundary tests](docs/DRAG_REPLAY.md).
+
 Seeking preserves play/pause. A chosen sentence outside an A–B range exits the range; other seek controls stay inside it. **Follow** returns to playback, or following resumes after five idle seconds. Cancelled gestures, multi-touch, long holds, changed media/delay, orientation changes, and sentences without a playable timestamp never commit a drag seek. The offset convention is `lyric milliseconds = audio seconds × 1000 + offset milliseconds`; the guide displays the corresponding audio time.
 
 

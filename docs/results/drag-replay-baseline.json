@@ -1,0 +1,14 @@
+{
+  "commit": "9cfe2dd9ec78d49ad1a0f54d636b7db7c0b006f9",
+  "browser": "Chromium",
+  "viewport": { "width": 1280, "height": 900 },
+  "audio_time_seconds": 12,
+  "active_line_index": 1,
+  "current_row": { "top": 151, "height": 245, "start_seconds": 8 },
+  "next_row": { "top": 396, "height": 93, "start_seconds": 16 },
+  "guide": 394,
+  "expected_line_index": 1,
+  "actual_line_index": 2,
+  "result": "FAIL: nearest-centre rule selected the next short row while the guide remained inside the current wrapped row",
+  "geometry_note": "Coordinates are local unscaled layout CSS pixels, rounded for this record; measurements came from the browser regression, not a physical iPad."
+}

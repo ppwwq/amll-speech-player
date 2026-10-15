@@ -53,3 +53,16 @@ export function dragSeekTime(lineStartMs: number, delayMs: number, duration: num
   const seconds = audioTimeSeconds(lineStartMs, delayMs);
   return seconds >= 0 && seconds < duration ? seconds : null;
 }
+
+/** Rows are ordered by their unscaled layout top. Divide the gap between their
+ * edges, so wrapping/preview scale cannot give a short neighbour part of a row.
+ * An exact boundary belongs to the following row, independent of the last target.
+ */
+export function dragSelectionIndex(rows: readonly { top: number; height: number }[], guide: number): number {
+  if (!rows.length) return -1;
+  for (let i = 1; i < rows.length; i++) {
+    const previous = rows[i - 1];
+    if (guide < (previous.top + previous.height + rows[i].top) / 2) return i - 1;
+  }
+  return rows.length - 1;
+}

@@ -1,0 +1,622 @@
+{
+  "cases": {
+    "desktop": {
+      "gap_1_2": [
+        {
+          "relative": 2,
+          "index": 1,
+          "heights": [
+            245,
+            93
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 2,
+          "heights": [
+            245,
+            93
+          ]
+        },
+        {
+          "relative": 2,
+          "index": 1,
+          "heights": [
+            245,
+            93
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 2,
+          "heights": [
+            245,
+            93
+          ]
+        }
+      ],
+      "gap_2_3": [
+        {
+          "relative": 2,
+          "index": 2,
+          "heights": [
+            93,
+            245
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 3,
+          "heights": [
+            93,
+            245
+          ]
+        },
+        {
+          "relative": 2,
+          "index": 2,
+          "heights": [
+            93,
+            245
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 3,
+          "heights": [
+            93,
+            245
+          ]
+        }
+      ],
+      "same_sentence_playing_False": [
+        {
+          "time": 8,
+          "lyric": 8000,
+          "paused": true,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8,
+          "lyric": 8000,
+          "paused": true,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8,
+          "lyric": 8000,
+          "paused": true,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        }
+      ],
+      "same_sentence_playing_True": [
+        {
+          "time": 8.090599,
+          "lyric": 8062,
+          "paused": false,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8.090594,
+          "lyric": 8079,
+          "paused": false,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8.085612,
+          "lyric": 8075,
+          "paused": false,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        }
+      ],
+      "tap_and_drag_threshold": true,
+      "pointercancel_no_seek": true
+    },
+    "landscape": {
+      "gap_1_2": [
+        {
+          "relative": 2,
+          "index": 1,
+          "heights": [
+            209,
+            79
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 2,
+          "heights": [
+            209,
+            79
+          ]
+        },
+        {
+          "relative": 2,
+          "index": 1,
+          "heights": [
+            209,
+            79
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 2,
+          "heights": [
+            209,
+            79
+          ]
+        }
+      ],
+      "gap_2_3": [
+        {
+          "relative": 2,
+          "index": 2,
+          "heights": [
+            79,
+            209
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 3,
+          "heights": [
+            79,
+            209
+          ]
+        },
+        {
+          "relative": 2,
+          "index": 2,
+          "heights": [
+            79,
+            209
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 3,
+          "heights": [
+            79,
+            209
+          ]
+        }
+      ],
+      "same_sentence_playing_False": [
+        {
+          "time": 8,
+          "lyric": 8000,
+          "paused": true,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8,
+          "lyric": 8000,
+          "paused": true,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8,
+          "lyric": 8000,
+          "paused": true,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        }
+      ],
+      "same_sentence_playing_True": [
+        {
+          "time": 8.082409,
+          "lyric": 8076,
+          "paused": false,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8.089916,
+          "lyric": 8066,
+          "paused": false,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8.091212,
+          "lyric": 8073,
+          "paused": false,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        }
+      ],
+      "tap_and_drag_threshold": true,
+      "pointercancel_no_seek": true
+    },
+    "portrait": {
+      "gap_1_2": [
+        {
+          "relative": 2,
+          "index": 1,
+          "heights": [
+            223,
+            84
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 2,
+          "heights": [
+            223,
+            84
+          ]
+        },
+        {
+          "relative": 2,
+          "index": 1,
+          "heights": [
+            223,
+            84
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 2,
+          "heights": [
+            223,
+            84
+          ]
+        }
+      ],
+      "gap_2_3": [
+        {
+          "relative": 2,
+          "index": 2,
+          "heights": [
+            84,
+            223
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 3,
+          "heights": [
+            84,
+            223
+          ]
+        },
+        {
+          "relative": 2,
+          "index": 2,
+          "heights": [
+            84,
+            223
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 3,
+          "heights": [
+            84,
+            223
+          ]
+        }
+      ],
+      "same_sentence_playing_False": [
+        {
+          "time": 8,
+          "lyric": 8000,
+          "paused": true,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8,
+          "lyric": 8000,
+          "paused": true,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8,
+          "lyric": 8000,
+          "paused": true,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        }
+      ],
+      "same_sentence_playing_True": [
+        {
+          "time": 8.084725,
+          "lyric": 8077,
+          "paused": false,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8.091188,
+          "lyric": 8067,
+          "paused": false,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8.092822,
+          "lyric": 8069,
+          "paused": false,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        }
+      ],
+      "tap_and_drag_threshold": true,
+      "pointercancel_no_seek": true
+    },
+    "phone": {
+      "gap_1_2": [
+        {
+          "relative": 2,
+          "index": 1,
+          "heights": [
+            230,
+            62
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 2,
+          "heights": [
+            230,
+            62
+          ]
+        },
+        {
+          "relative": 2,
+          "index": 1,
+          "heights": [
+            230,
+            62
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 2,
+          "heights": [
+            230,
+            62
+          ]
+        }
+      ],
+      "gap_2_3": [
+        {
+          "relative": 2,
+          "index": 2,
+          "heights": [
+            62,
+            230
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 3,
+          "heights": [
+            62,
+            230
+          ]
+        },
+        {
+          "relative": 2,
+          "index": 2,
+          "heights": [
+            62,
+            230
+          ]
+        },
+        {
+          "relative": -2,
+          "index": 3,
+          "heights": [
+            62,
+            230
+          ]
+        }
+      ],
+      "same_sentence_playing_False": [
+        {
+          "time": 8,
+          "lyric": 8000,
+          "paused": true,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8,
+          "lyric": 8000,
+          "paused": true,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8,
+          "lyric": 8000,
+          "paused": true,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        }
+      ],
+      "same_sentence_playing_True": [
+        {
+          "time": 8.077089,
+          "lyric": 8070,
+          "paused": false,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8.106214,
+          "lyric": 8076,
+          "paused": false,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        },
+        {
+          "time": 8.088634,
+          "lyric": 8062,
+          "paused": false,
+          "following": true,
+          "range": false,
+          "hot": [
+            1
+          ],
+          "visualActive": [
+            1
+          ]
+        }
+      ],
+      "tap_and_drag_threshold": true,
+      "pointercancel_no_seek": true
+    }
+  },
+  "page_errors": [],
+  "limits": "Chromium, synthetic WAV/LRC; no physical iPad or Safari."
+}
