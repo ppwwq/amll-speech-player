@@ -15,29 +15,69 @@
   <link rel="apple-touch-icon" href="%BASE_URL%icons/icon-192x192.png" />
   <style>
     #practiceToolbar { position: fixed; inset: max(10px, env(safe-area-inset-top)) 16px auto; z-index: 48; display: flex; gap: 10px; align-items: center; color: #fff; font-size: 12px; }
-    #practiceToolbar button, #followPlayback { padding: 10px 15px; border: 1px solid #ffffff40; border-radius: 20px; background: #23111dcc; color: #fff; cursor: pointer; min-height: 44px; }
+    #practiceToolbar button { padding: 10px 15px; border-radius: 20px; cursor: pointer; min-height: 44px; }
+    #followPlayback { padding: 10px 15px; border: 1px solid #ffffff40; border-radius: 20px; background: #23111dcc; color: #fff; cursor: pointer; min-height: 44px; }
     #practiceToolbar a { color: #fff; margin-left: auto; }
     #practiceToolbar span { opacity: .75; }
-    #localSavePanel { position: fixed; top: max(58px, calc(env(safe-area-inset-top) + 48px)); right: 16px; z-index: 60; color: #fff; font-size: 12px; max-width: calc(100vw - 32px); }
-    #localSavePanel summary { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 12px; border: 1px solid #ffffff40; border-radius: 16px; background: #23111de8; cursor: pointer; list-style: none; }
+    #localSavePanel { position: fixed; top: max(58px, calc(env(safe-area-inset-top) + 48px)); right: 16px; z-index: 60; color: #302638; font-size: 12px; max-width: calc(100vw - 32px); }
+    #localSavePanel summary { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 12px; border-radius: 16px; cursor: pointer; list-style: none; }
     #localSavePanel summary::-webkit-details-marker { display: none; }
     #localSavePanel summary::after { content: '▾'; }
     #localSavePanel[open] summary::after { content: '▴'; }
-    #localSavePanel[data-phase="error"] summary { border-color: #ffc3a8; }
-    #localSavePanel .save-details { position: absolute; top: 48px; right: 0; width: 300px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 170px); overflow-y: auto; box-sizing: border-box; padding: 14px; border: 1px solid #ffffff50; border-radius: 14px; background: #23111df5; box-shadow: 0 8px 30px #0006; line-height: 1.6; }
+    #localSavePanel .save-details { position: absolute; top: 48px; right: 0; width: 300px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 170px); overflow-y: auto; box-sizing: border-box; padding: 14px; border-radius: 14px; line-height: 1.6; }
     #localSavePanel p { margin: 0 0 12px; }
-    #localSavePanel .save-note { color: #e3d6df; font-size: 11px; }
-    #localSavePanel button { min-height: 44px; padding: 8px 12px; margin: 2px 4px 2px 0; border: 1px solid #ffffff50; border-radius: 10px; background: #ffffff18; color: #fff; cursor: pointer; }
-    #localSavePanel button:disabled { opacity: .45; cursor: default; }
+    #localSavePanel .save-note { color: inherit; font-size: 11px; }
+    #localSavePanel button { min-height: 44px; padding: 8px 12px; margin: 2px 4px 2px 0; border: 1px solid rgb(74 53 88 / 30%); border-radius: 10px; background: rgb(255 255 255 / 26%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 48%); color: inherit; cursor: pointer; }
+    #localSavePanel button:disabled { opacity: .6; cursor: default; }
+    /* Pale glass keeps dark text readable over either light or dark artwork.
+       The higher-opacity base is also the no-backdrop-filter fallback. */
+    #practiceToolbar button, #localSavePanel summary, #localSavePanel .save-details {
+      color: #302638;
+      background-color: rgb(244 237 250 / 94%);
+      background-image: linear-gradient(135deg, rgb(255 255 255 / 26%), rgb(255 255 255 / 6%));
+      border: 1px solid rgb(255 255 255 / 58%);
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 55%), 0 4px 16px rgb(54 30 66 / 14%);
+    }
+    @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+      #practiceToolbar button, #localSavePanel summary, #localSavePanel .save-details {
+        background-color: rgb(244 237 250 / 66%);
+        -webkit-backdrop-filter: blur(10px) saturate(115%);
+        backdrop-filter: blur(10px) saturate(115%);
+      }
+    }
+    #practiceToolbar #dragSeekMode[aria-pressed="true"] {
+      border-color: #675376;
+      box-shadow: inset 0 0 0 1px #675376, inset 0 2px 0 rgb(255 255 255 / 65%), 0 4px 16px rgb(54 30 66 / 14%);
+      background-image: linear-gradient(135deg, rgb(255 255 255 / 40%), rgb(219 194 238 / 26%));
+    }
+    #localSavePanel[data-phase="error"] summary { border-color: #8b414d; box-shadow: inset 0 0 0 1px #8b414d, 0 4px 16px rgb(54 30 66 / 14%); }
+    #practiceToolbar button:focus-visible, #localSavePanel summary:focus-visible, #localSavePanel button:focus-visible {
+      outline: 2px solid #493452;
+      outline-offset: 3px;
+      box-shadow: 0 0 0 3px rgb(255 255 255 / 90%);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      #practiceToolbar button:hover, #localSavePanel summary:hover { background-color: rgb(244 237 250 / 82%); }
+      #localSavePanel button:not(:disabled):hover { background-color: rgb(255 255 255 / 48%); }
+    }
+    #practiceToolbar button:active, #localSavePanel summary:active, #localSavePanel button:not(:disabled):active { border-color: #675376; }
+    @media (prefers-reduced-transparency: reduce) {
+      #practiceToolbar button, #localSavePanel summary, #localSavePanel .save-details { background-color: rgb(244 237 250 / 96%); -webkit-backdrop-filter: none; backdrop-filter: none; }
+    }
+    @media (forced-colors: active) {
+      #practiceToolbar button, #localSavePanel summary, #localSavePanel .save-details, #localSavePanel button { color: CanvasText; background: Canvas; border-color: ButtonText; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+      #practiceToolbar #dragSeekMode[aria-pressed="true"] { background: ButtonFace; color: ButtonText; border-color: Highlight; outline: 2px solid Highlight; outline-offset: -3px; box-shadow: none; }
+    }
     #followPlayback { position: absolute; bottom: 45px; right: 24px; z-index: 40; }
     #followPlayback[hidden] { display: none; }
     .speech-lyrics { overscroll-behavior: contain; user-select: none; -webkit-user-select: none; }
-    #dragSeekMode[aria-pressed="true"] { background: #e8d9e8; color: #33172d; }
     .drag-seek-guide { position: absolute; left: 12px; right: 12px; height: 0; border-top: 2px solid #fff; z-index: 42; pointer-events: none; }
     .drag-seek-guide[hidden] { display: none; }
     .drag-seek-guide::before { content: ''; position: absolute; top: -7px; left: 0; border-left: 9px solid #fff; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
     .drag-seek-label { position: absolute; left: 12px; bottom: 10px; padding: 6px 10px; border-radius: 8px; background: rgb(39 19 38 / 55%); color: #fff; text-shadow: 0 1px 3px #000; font-size: 14px; line-height: 1.45; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .speech-lyrics [data-drag-candidate] { outline: 2px solid #ffffffa0; outline-offset: -3px; }
+    /* Use AMLL's word-mask variables for preview brightness without starting
+       playback/word animations. Its own scale spring handles the enlargement. */
+    .speech-lyrics [data-drag-candidate] { --bright-mask-alpha: 1 !important; --dark-mask-alpha: 1 !important; }
     @media (max-width: 1100px) { #practiceToolbar strong { display: none; } #practiceHint { position: fixed; top: 61px; left: 18px; font-size: 11px; } }
     @media (max-width: 600px) { #practiceToolbar { gap: 5px; inset-inline: 8px; } #practiceToolbar button { padding-inline: 10px; } #practiceToolbar a { max-width: 60px; font-size: 10px; } }
     .speech-lyrics.manual-scroll [role="button"] { transition: none !important; }

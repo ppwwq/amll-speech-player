@@ -1,0 +1,378 @@
+{
+  "viewports": {
+    "desktop": {
+      "controls": [
+        {
+          "selector": "#openPracticeAudio",
+          "x": 112.46875,
+          "y": 10,
+          "w": 96.453125,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#openPracticeLyrics",
+          "x": 218.921875,
+          "y": 10,
+          "w": 114.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#dragSeekMode",
+          "x": 343.890625,
+          "y": 10,
+          "w": 111.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.82)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#localSavePanel summary",
+          "x": 1155.296875,
+          "y": 58,
+          "w": 108.703125,
+          "h": 46,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#saveLocalSession",
+          "x": 979,
+          "y": 218.96875,
+          "w": 145.953125,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(255, 255, 255, 0.26)",
+          "blur": "none"
+        },
+        {
+          "selector": "#clearLocalSession",
+          "x": 1132.296875,
+          "y": 218.96875,
+          "w": 105.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(255, 255, 255, 0.26)",
+          "blur": "none"
+        }
+      ],
+      "picker_and_keyboard_toggle_save_clear": true
+    },
+    "tablet-landscape": {
+      "controls": [
+        {
+          "selector": "#openPracticeAudio",
+          "x": 16,
+          "y": 10,
+          "w": 96.453125,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#openPracticeLyrics",
+          "x": 122.453125,
+          "y": 10,
+          "w": 114.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#dragSeekMode",
+          "x": 247.421875,
+          "y": 10,
+          "w": 111.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#localSavePanel summary",
+          "x": 899.296875,
+          "y": 58,
+          "w": 108.703125,
+          "h": 46,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#saveLocalSession",
+          "x": 723,
+          "y": 218.96875,
+          "w": 145.953125,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(255, 255, 255, 0.26)",
+          "blur": "none"
+        },
+        {
+          "selector": "#clearLocalSession",
+          "x": 876.296875,
+          "y": 218.96875,
+          "w": 105.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(255, 255, 255, 0.26)",
+          "blur": "none"
+        }
+      ],
+      "picker_and_keyboard_toggle_save_clear": true
+    },
+    "tablet-portrait": {
+      "controls": [
+        {
+          "selector": "#openPracticeAudio",
+          "x": 16,
+          "y": 10,
+          "w": 96.453125,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#openPracticeLyrics",
+          "x": 122.453125,
+          "y": 10,
+          "w": 114.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#dragSeekMode",
+          "x": 247.421875,
+          "y": 10,
+          "w": 111.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#localSavePanel summary",
+          "x": 643.296875,
+          "y": 58,
+          "w": 108.703125,
+          "h": 46,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#saveLocalSession",
+          "x": 467,
+          "y": 218.96875,
+          "w": 145.953125,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(255, 255, 255, 0.26)",
+          "blur": "none"
+        },
+        {
+          "selector": "#clearLocalSession",
+          "x": 620.296875,
+          "y": 218.96875,
+          "w": 105.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(255, 255, 255, 0.26)",
+          "blur": "none"
+        }
+      ],
+      "picker_and_keyboard_toggle_save_clear": true
+    },
+    "phone": {
+      "controls": [
+        {
+          "selector": "#openPracticeAudio",
+          "x": 8,
+          "y": 10,
+          "w": 86.453125,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#openPracticeLyrics",
+          "x": 99.453125,
+          "y": 10,
+          "w": 104.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#dragSeekMode",
+          "x": 209.421875,
+          "y": 10,
+          "w": 101.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#localSavePanel summary",
+          "x": 265.296875,
+          "y": 58,
+          "w": 108.703125,
+          "h": 46,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#saveLocalSession",
+          "x": 89,
+          "y": 218.96875,
+          "w": 145.953125,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(255, 255, 255, 0.26)",
+          "blur": "none"
+        },
+        {
+          "selector": "#clearLocalSession",
+          "x": 242.296875,
+          "y": 218.96875,
+          "w": 105.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(255, 255, 255, 0.26)",
+          "blur": "none"
+        }
+      ],
+      "picker_and_keyboard_toggle_save_clear": true
+    },
+    "phone-landscape": {
+      "controls": [
+        {
+          "selector": "#openPracticeAudio",
+          "x": 16,
+          "y": 10,
+          "w": 96.453125,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#openPracticeLyrics",
+          "x": 122.453125,
+          "y": 10,
+          "w": 114.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#dragSeekMode",
+          "x": 247.421875,
+          "y": 10,
+          "w": 111.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#localSavePanel summary",
+          "x": 719.296875,
+          "y": 58,
+          "w": 108.703125,
+          "h": 46,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(244, 237, 250, 0.66)",
+          "blur": "blur(10px) saturate(1.15)"
+        },
+        {
+          "selector": "#saveLocalSession",
+          "x": 543,
+          "y": 218.96875,
+          "w": 145.953125,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(255, 255, 255, 0.26)",
+          "blur": "none"
+        },
+        {
+          "selector": "#clearLocalSession",
+          "x": 696.296875,
+          "y": 218.96875,
+          "w": 105.96875,
+          "h": 44,
+          "hit": true,
+          "color": "rgb(48, 38, 56)",
+          "bg": "rgba(255, 255, 255, 0.26)",
+          "blur": "none"
+        }
+      ],
+      "picker_and_keyboard_toggle_save_clear": true
+    }
+  },
+  "errors": [],
+  "fallback": {
+    "bg": "rgba(244, 237, 250, 0.94)",
+    "blur": "none"
+  },
+  "keyboard_focus": {
+    "focused": true,
+    "visible": true,
+    "outline": "2px"
+  },
+  "conservative_min_text_contrast": 5.37,
+  "limits": "Real Chromium; simulated sizes/touch and no-blur fallback; no physical iPad or Safari rendering/performance measurement.",
+  "forced_colors": {
+    "text": "rgb(0, 0, 0)",
+    "bg": "rgb(255, 255, 255)",
+    "outline": "2px"
+  },
+  "empty_disabled_and_quota_error_visible": true,
+  "keyboard_scope": "Tab/Enter activate the controls. Existing global Space playback shortcut is unchanged."
+}

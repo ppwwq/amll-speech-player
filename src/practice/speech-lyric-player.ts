@@ -4,9 +4,10 @@ import { TapGesture, DoubleTapGesture, DOUBLE_TAP_WINDOW_MS, dragSeekTime } from
 type Line = DomLyricPlayer['currentLyricLineObjects'][number];
 // Runtime fields of pinned alpha.5, omitted from its declarations by @internal.
 type LineSprings = { lineTransforms: {
-  posY: { setTargetPosition(position: number): void };
+  posY: { setTargetPosition(position: number): void; setPosition(position: number): void };
   scale: { setTargetPosition(position: number): void };
 } };
+type LineLayout = [top: number, scale: number, opacity: number, blur: number];
 type DragPointer = {
   id: number; y: number; time: number; velocity: number; line?: Line;
   startX: number; startY: number; startedAt: number; dragging: boolean;
@@ -33,6 +34,8 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
   private dragLabel = document.createElement('div');
   private dragCandidate: { line: Line; seconds: number } | null = null;
   private previewLine: Line | null = null;
+  private lineLayout = new WeakMap<Line, LineLayout>();
+  private reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   private firstMainLine: Line | null = null;
   private lastMainLine: Line | null = null;
   private dragScrollBounds: [number, number] | null = null;
@@ -109,10 +112,23 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
   private hideDragPreview() {
     this.dragGuide.hidden = true;
     this.dragCandidate = null;
-    this.previewLine?.getElement().removeAttribute('data-drag-candidate');
-    this.previewLine = null;
+    this.setPreviewLine(null);
     delete this.dragGuide.dataset.startMs;
     delete this.dragGuide.dataset.audioSeconds;
+  }
+
+  private setPreviewLine(line: Line | null) {
+    if (line === this.previewLine) return;
+    const previous = this.previewLine;
+    previous?.getElement().removeAttribute('data-drag-candidate');
+    this.previewLine = line;
+    line?.getElement().setAttribute('data-drag-candidate', 'true');
+    // Reapply only the visual parameters through AMLL's existing renderer.
+    // Do not enable a lyric, change its word clock, or seek audio during preview.
+    for (const target of [previous, line]) {
+      const layout = target && this.lineLayout.get(target);
+      if (target && layout) target.setTransform(...layout);
+    }
   }
 
   private updateDragPreview() {
@@ -132,11 +148,7 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
     }
     const seconds = nearest ? dragSeekTime(nearest.getLine().startTime, this.lyricDelayMs, this.seekDuration) : null;
     this.dragCandidate = p.inside && nearest && seconds !== null ? { line: nearest, seconds } : null;
-    if (this.previewLine !== this.dragCandidate?.line) {
-      this.previewLine?.getElement().removeAttribute('data-drag-candidate');
-      this.previewLine = this.dragCandidate?.line ?? null;
-      this.previewLine?.getElement().setAttribute('data-drag-candidate', 'true');
-    }
+    this.setPreviewLine(this.dragCandidate?.line ?? null);
     const candidate = this.dragCandidate;
     let label = '';
     if (candidate) {
@@ -392,6 +404,7 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
   override setLyricLines(lines: LyricLine[], initialTime = 0) {
     this.resetScroll();
     this.animated.clear();
+    this.lineLayout = new WeakMap();
     this.firstMainLine = null; this.lastMainLine = null; this.dragScrollBounds = null;
     super.setLyricLines(lines, initialTime);
     for (const line of this.currentLyricLineObjects) {
@@ -412,9 +425,17 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
       };
       let parked = false;
       line.setTransform = (top = 0, scale = 100, opacity = 1, blur = 0, force = false, delay = 0) => {
+        this.lineLayout.set(line, [top, scale, opacity, blur]);
         const height = this.lyricLinesSize.get(line)?.[1] ?? this.size[1] / 5;
         const near = top < this.size[1] + height && top + height > -height;
         this.targetTop.set(line, top);
+        if (line === this.previewLine) {
+          // Keep the original measured box for selection/ordering. AMLL scales
+          // about the row's vertical centre; cap growth for very tall wrapped text.
+          if (!this.reducedMotion.matches) scale = 100 + Math.min(3, 1200 / Math.max(1, height));
+          opacity = 1;
+          blur = 0;
+        }
         if (!near && (this.snapLayout || parked || !line.isInSight)) {
           if (!parked) { resetSprings(top, scale); transform(top, scale, opacity, 0, true, 0); line.hide(); }
           parked = true;
@@ -423,8 +444,16 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
         }
         // Rows retired by update() also need a reset when they re-enter.
         const snap = force || parked || !this.animated.has(line) || this.manual || this.snapLayout;
-        if (snap) resetSprings(top, scale);
-        transform(top, scale, opacity, this.manual ? 0 : Math.min(4, blur), snap, snap ? 0 : delay);
+        const smoothScale = this.manual && this.getEnableSpring() && !this.reducedMotion.matches
+          && !force && !parked && this.animated.has(line);
+        if (smoothScale) {
+          // Drag position follows the finger immediately, while the same native
+          // scale spring eases target emphasis. No additional CSS transform/loop.
+          const posY = (line as Line & LineSprings).lineTransforms.posY;
+          posY.setTargetPosition(top);
+          posY.setPosition(top);
+        } else if (snap) resetSprings(top, scale);
+        transform(top, scale, opacity, this.manual ? 0 : Math.min(4, blur), snap && !smoothScale, snap ? 0 : delay);
         parked = false;
         this.animated.add(line);
         if (near) line.show();

@@ -1,0 +1,34 @@
+{
+  "cases": {
+    "desktop": {
+      "early_scale": 1.0279,
+      "settled_scale": 1.03,
+      "stable_layout_no_early_seek": true,
+      "release_once_cancel_cleans": true,
+      "keyboard_focus_retained": true
+    },
+    "tablet": {
+      "early_scale": 1.0288,
+      "settled_scale": 1.03,
+      "stable_layout_no_early_seek": true,
+      "release_once_cancel_cleans": true,
+      "keyboard_focus_retained": true
+    },
+    "phone-wrapped": {
+      "early_scale": 1.0279,
+      "settled_scale": 1.03,
+      "stable_layout_no_early_seek": true,
+      "release_once_cancel_cleans": true,
+      "keyboard_focus_retained": true
+    },
+    "reduced-motion": {
+      "early_scale": 1,
+      "settled_scale": 1,
+      "stable_layout_no_early_seek": true,
+      "release_once_cancel_cleans": true,
+      "keyboard_focus_retained": true
+    }
+  },
+  "page_errors": [],
+  "limits": "Chromium with touch/viewport/reduced-motion emulation; no physical iPad/Safari execution."
+}

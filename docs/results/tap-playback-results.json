@@ -3,8 +3,8 @@
   "cases": {
     "mouse_single_line_resume_pause": {
       "toggles": [
-        3073.4000000003725,
-        3491.2999999998137
+        2751.2000000001863,
+        3168.2999999998137
       ],
       "lines": [],
       "plays": 1,
@@ -13,8 +13,8 @@
     },
     "mouse_single_blank_resume_pause": {
       "toggles": [
-        4425.299999999814,
-        4837.200000000186
+        4094.899999999441,
+        4508.299999999814
       ],
       "lines": [],
       "plays": 1,
@@ -62,8 +62,8 @@
     "mouse_no_audio_no_play_attempt": true,
     "touch_single_line_resume_pause": {
       "toggles": [
-        2664.7999999998137,
-        3081.100000000559
+        3572.10000000149,
+        4028.4000000003725
       ],
       "lines": [],
       "plays": 1,
@@ -72,8 +72,8 @@
     },
     "touch_single_blank_resume_pause": {
       "toggles": [
-        4013.4000000003725,
-        4432.799999999814
+        4972.300000000745,
+        5403.9000000003725
       ],
       "lines": [],
       "plays": 1,
