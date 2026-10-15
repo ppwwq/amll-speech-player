@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "test:browser": "python tests/browser.py && python tests/drag_seek.py && python tests/ui_checks.py && python tests/seek_order.py && python tests/tap_playback.py"
+    "test:browser": "python tests/file_import.py && python tests/browser.py && python tests/drag_seek.py && python tests/ui_checks.py && python tests/seek_order.py && python tests/tap_playback.py"
   },
   "keywords": [
     "lyrics",

@@ -720,7 +720,8 @@
           </svg>
         </button>
       </div>
-      <input type="file" id="musicFile" accept="audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac" style="display: none;"
+      <!-- No accept filter: Files providers on iPad may misidentify MP3/LRC types. Validate after selection. -->
+      <input type="file" id="musicFile" style="display: none;"
         title="Select music file" />
       <div class="flex-group-without-margin">
         <svg width="1em" height="1em" style="margin-bottom: 8px; padding: 6px; margin-right: 0px;"
@@ -767,7 +768,7 @@
           </svg>
         </button>
       </div>
-      <input type="file" id="lyricFile" accept="text/plain,.lrc,.ttml,.yrc,.lys,.qrc,.ass,.lqe,.lyl,.spl,.srt"
+      <input type="file" id="lyricFile"
         title="Select lyric file" style="display: none;" />
       <!-- <div
         style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: -4px; margin-bottom: 8px;" data-i18n="supportedLyricFormats"

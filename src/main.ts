@@ -24,6 +24,7 @@ import { isLqeFormat, parseLqe, lqeToTTML } from "./lyric/lqe-parser";
 import { isLylFormat, parseLyl, lylToTTML } from "./lyric/lyl-parser";
 import { isSrtFormat, parseSrt, srtToTTML } from "./lyric/srt-parser";
 import { normalizeLrcTimings } from "./lyric/lrc-timing";
+import { createPlayableAudioUrl, isAudioFile, isCaptionFile } from "./local-files";
 
 // 导入测试脚本（仅在开发环境中使用）
 import { getCurrentLanguage, getTranslations, t } from "./i18n";
@@ -145,6 +146,11 @@ class WebLyricsPlayer {
   private musicFile: HTMLInputElement | null = null;
   private lyricFile: HTMLInputElement | null = null;
   private coverFile: HTMLInputElement | null = null;
+  // Successful selections outlive the native input, which is cleared for reselection.
+  private selectedMusicFile: File | null = null;
+  private selectedLyricFile: File | null = null;
+  private musicLoadId = 0;
+  private lyricLoadId = 0;
   private musicFileBtn: HTMLElement | null = null;
   private lyricFileBtn: HTMLElement | null = null;
   private coverFileBtn: HTMLElement | null = null;
@@ -294,33 +300,6 @@ class WebLyricsPlayer {
   }
 
   private initUploadButtons() {
-    if (this.musicFile) {
-      this.musicFile.addEventListener('change', (e: Event) => {
-        const hasFile = (e.target as HTMLInputElement).files?.[0];
-        if (!this.musicFileBtn) return;
-
-        const uploadIcon = this.musicFileBtn.querySelector('.upload-icon') as HTMLElement;
-        const uploadedIcon = this.musicFileBtn.querySelector('.uploaded-icon') as HTMLElement;
-
-        if (uploadIcon && uploadedIcon) {
-          uploadIcon.style.display = hasFile ? 'none' : 'block';
-          uploadedIcon.style.display = hasFile ? 'block' : 'none';
-        }
-      });
-    }
-
-    if (this.lyricFile) {
-      this.lyricFile.addEventListener('change', (e: Event) => {
-        const hasFile = (e.target as HTMLInputElement).files?.[0];
-        const uploadIcon = this.lyricFileBtn?.querySelector('.upload-icon') as HTMLElement;
-        const uploadedIcon = this.lyricFileBtn?.querySelector('.uploaded-icon') as HTMLElement;
-        if (uploadIcon && uploadedIcon) {
-          uploadIcon.style.display = hasFile ? 'none' : 'block';
-          uploadedIcon.style.display = hasFile ? 'block' : 'none';
-        }
-      });
-    }
-
     if (this.coverFile) {
       this.coverFile.addEventListener('change', (e: Event) => {
         const hasFile = (e.target as HTMLInputElement).files?.[0];
@@ -1654,18 +1633,22 @@ class WebLyricsPlayer {
 
     this.musicFile?.addEventListener("change", (e) => {
       if (!e.target) return;
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        this.loadMusicFromFile(file);
-      }
+      const input = e.target as HTMLInputElement;
+      const file = input.files?.[0];
+      // Reset synchronously, including failed selections. Cancel keeps the last
+      // successful File and display; choosing the same file fires change again.
+      input.value = "";
+      if (file) void this.loadMusicFromFile(file);
     });
 
     this.lyricFile?.addEventListener("change", (e) => {
       if (!e.target) return;
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        this.loadLyricFromFile(file);
-      }
+      const input = e.target as HTMLInputElement;
+      const file = input.files?.[0];
+      // Reset synchronously, including failed selections. Cancel keeps the last
+      // successful File and display; choosing the same file fires change again.
+      input.value = "";
+      if (file) void this.loadLyricFromFile(file);
     });
 
     this.coverFile?.addEventListener("change", (e) => {
@@ -3009,12 +2992,11 @@ class WebLyricsPlayer {
 
         if (e.dataTransfer?.files.length) {
           const file = e.dataTransfer.files[0];
-          if (file.type.startsWith("image/")) {
+          if (isAudioFile(file)) {
+            void this.loadMusicFromFile(file);
+          } else if (file.type.startsWith("image/")) {
             this.loadCoverFromFile(file);
             this.updateFileInputDisplay("coverFile", file);
-          } else if (file.type.startsWith("audio/") || /\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(file.name)) {
-            this.loadMusicFromFile(file);
-            this.updateFileInputDisplay("musicFile", file);
           } else {
             this.showStatus("不支持的文件类型，请拖拽音频或图片文件", true);
           }
@@ -3038,15 +3020,7 @@ class WebLyricsPlayer {
 
         if (e.dataTransfer?.files.length) {
           const file = e.dataTransfer.files[0];
-          // 检查文件类型，iOS Safari 可能会上传 text/plain 类型的文件或空类型
-          if (
-            file.name.match(/\.(lrc|ttml|yrc|lys|qrc|txt|ass|lqe|lyl|srt|spl)$/i) ||
-            file.type === "text/plain" ||
-            file.type === ""
-          ) {
-            this.loadLyricFromFile(file);
-            this.updateFileInputDisplay("lyricFile", file);
-          }
+          void this.loadLyricFromFile(file);
         }
       });
     }
@@ -3063,6 +3037,14 @@ class WebLyricsPlayer {
     }
 
     if (!fileInput) return;
+
+    // Icons represent a completed load, not an unvalidated picker selection.
+    const button = inputId === "musicFile" ? this.musicFileBtn
+      : inputId === "lyricFile" ? this.lyricFileBtn : this.coverFileBtn;
+    const uploadIcon = button?.querySelector<HTMLElement>('.upload-icon');
+    const loadedIcon = button?.querySelector<HTMLElement>('.uploaded-icon');
+    if (uploadIcon) uploadIcon.style.display = file ? 'none' : 'block';
+    if (loadedIcon) loadedIcon.style.display = file ? 'block' : 'none';
 
     if (!file) {
       const oldDisplay = document.getElementById(`${inputId}Display`);
@@ -3225,21 +3207,21 @@ class WebLyricsPlayer {
   }
 
   private async loadMusicFromFile(file: File) {
+    const loadId = ++this.musicLoadId;
+    let url: string | undefined;
     try {
-      // 检查文件类型，iOS Safari 可能会上传不同类型的音频文件
-      const isAudioType = file.type.startsWith("audio/");
-      const isValidExtension = /\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(file.name);
-
-      if (!isAudioType && !isValidExtension) {
-        this.showStatus(t("musicLoadFailed"), true);
+      url = await createPlayableAudioUrl(file);
+      if (loadId !== this.musicLoadId) {
+        URL.revokeObjectURL(url);
         return;
       }
-
-      const url = URL.createObjectURL(file);
+      const previousUrl = this.state.musicUrl;
+      this.selectedMusicFile = file;
       this.state.musicUrl = url;
       this.audio.crossOrigin = "anonymous"; // 允许跨域访问音频文件
       this.audio.src = url;
       this.audio.load();
+      if (previousUrl.startsWith('blob:')) URL.revokeObjectURL(previousUrl);
 
       if (this.playControls) {
         this.playControls.style.bottom = "";
@@ -3256,6 +3238,7 @@ class WebLyricsPlayer {
         this.updatePlayButton();
       }
       await this.parseAudioMetadata(file);
+      if (loadId !== this.musicLoadId) return;
       this.updateMediaSessionMetadata();
 
       if (this.controlPanel) {
@@ -3267,31 +3250,30 @@ class WebLyricsPlayer {
       this.updateFileInputDisplay("musicFile", file);
       this.showStatus(t("musicLoadSuccess"));
     } catch (error) {
-      this.showStatus(t("musicLoadFailed"), true);
+      if (url && url !== this.state.musicUrl) URL.revokeObjectURL(url);
+      if (loadId === this.musicLoadId) this.showStatus(t("musicLoadFailed"), true);
     }
   }
 
   private async loadLyricFromFile(file: File) {
+    const loadId = ++this.lyricLoadId;
     try {
-      // 检查文件类型，iOS Safari 可能会上传 text/plain 类型的文件
-      const isValidExtension = /\.(lrc|ttml|yrc|lys|qrc|txt|ass|lqe|lyl|srt|spl)$/i.test(
-        file.name
-      );
-      const isTextPlain = file.type === "text/plain" || file.type === "";
-
-      if (!isValidExtension && !isTextPlain) {
+      if (!file.size || !isCaptionFile(file)) {
         this.showStatus(t("lyricsLoadFailed"), true);
         return;
       }
-
       const text = await file.text();
-      const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
-      this.state.lyricUrl = url;
-      await this.loadLyricContent(text, file.name);
+      if (loadId !== this.lyricLoadId) return;
+      if (!await this.loadLyricContent(text, file.name)) return;
+      if (loadId !== this.lyricLoadId) return;
+      const previousUrl = this.state.lyricUrl;
+      this.state.lyricUrl = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+      if (previousUrl.startsWith('blob:')) URL.revokeObjectURL(previousUrl);
+      this.selectedLyricFile = file;
       this.updateFileInputDisplay("lyricFile", file);
       this.showStatus(t("lyricsLoadSuccess"));
     } catch (error) {
-      this.showStatus(t("lyricsLoadFailed"), true);
+      if (loadId === this.lyricLoadId) this.showStatus(t("lyricsLoadFailed"), true);
     }
   }
 
@@ -3440,6 +3422,8 @@ class WebLyricsPlayer {
     }
 
     if (musicUrl) {
+      ++this.musicLoadId;
+      this.selectedMusicFile = null;
       this.state.musicUrl = musicUrl;
       this.audio.src = musicUrl;
       this.audio.load();
@@ -3463,32 +3447,25 @@ class WebLyricsPlayer {
     }
 
     if (lyricUrl) {
-      this.state.lyricUrl = lyricUrl;
-
       const urlPattern = /^https?:\/\/.+/;
       if (urlPattern.test(lyricUrl.trim())) {
+        const loadId = ++this.lyricLoadId;
         try {
           const response = await fetch(lyricUrl);
+          if (!response.ok) throw new Error('Caption request failed');
           const text = await response.text();
-
-          const isESFormat = isESLyRiCFormat(text);
-          const isA2Format = isLyRiCA2Format(text);
-
-          if (lyricUrl.endsWith(".lrc")) {
-            if (isESFormat || isA2Format) {
-              await this.loadLyricContent(text, lyricUrl);
-            } else {
-              await this.loadLyricContent(text, lyricUrl);
-            }
-          } else {
-            await this.loadLyricContent(text, lyricUrl);
-          }
+          if (loadId !== this.lyricLoadId) return;
+          if (!await this.loadLyricContent(text, lyricUrl)) return;
+          if (loadId !== this.lyricLoadId) return;
+          this.selectedLyricFile = null;
+          this.state.lyricUrl = lyricUrl;
           this.updateFileInputDisplay("lyricFile", lyricUrl);
         } catch (error) {
-          this.showStatus(t("lyricsUrlLoadFailed"), true);
+          if (loadId === this.lyricLoadId) this.showStatus(t("lyricsUrlLoadFailed"), true);
+          return;
         }
-      } else {
-        await this.processLyricInput(lyricUrl);
+      } else if (!await this.processLyricInput(lyricUrl)) {
+        return;
       }
     }
 
@@ -3553,14 +3530,15 @@ class WebLyricsPlayer {
   }
 
   private async loadFromFiles() {
-    const musicFile = this.musicFile?.files?.[0];
-    const lyricFile = this.lyricFile?.files?.[0];
+    const musicFile = this.selectedMusicFile;
+    const lyricFile = this.selectedLyricFile;
     const coverFile = this.coverFile?.files?.[0];
 
     if (musicFile) {
       await this.loadMusicFromFile(musicFile);
     }
 
+    if (musicFile !== this.selectedMusicFile || lyricFile !== this.selectedLyricFile) return;
     if (lyricFile) {
       await this.loadLyricFromFile(lyricFile);
     }
@@ -3637,28 +3615,39 @@ class WebLyricsPlayer {
         } catch (e) {
           decodedContent = new TextDecoder('utf-8').decode(bytes);
         }
-        await this.loadLyricContent(decodedContent, "direct-input.txt");
+        ++this.lyricLoadId;
+        if (!await this.loadLyricContent(decodedContent, "direct-input.txt")) return false;
+        this.selectedLyricFile = null;
         this.updateFileInputDisplay("lyricFile", `Base64 Encoded Input (${contentType})`);
         this.showStatus(t("lyricsParseSuccess"));
+        return true;
       } catch (error) {
         console.error("Base64 decoding error:", error);
         this.showStatus(t("lyricsParseFailed"), true);
+        return false;
       }
-      return;
     }
 
     try {
-      await this.loadLyricContent(input, "direct-input.txt");
+      ++this.lyricLoadId;
+      if (!await this.loadLyricContent(input, "direct-input.txt")) return false;
+      this.selectedLyricFile = null;
       this.updateFileInputDisplay("lyricFile", "Direct Input");
       this.showStatus(t("lyricsParseSuccess"));
+      return true;
     } catch (error) {
       console.error("Direct lyric input error:", error);
       this.showStatus(t("lyricsParseFailed"), true);
+      return false;
     }
   }
 
-  private async loadLyricContent(content: string, filename: string) {
+  private async loadLyricContent(content: string, filename: string): Promise<boolean> {
     try {
+      filename = (/^https?:\/\//i.test(filename) ? new URL(filename).pathname : filename).toLowerCase();
+      if (!content.trim() || /[\x00-\x08\x0e-\x1f]/.test(content)) {
+        throw new Error('Empty or binary captions');
+      }
       let lines: LyricLine[] = [];
 
       const isESFormat = isESLyRiCFormat(content);
@@ -3741,6 +3730,10 @@ class WebLyricsPlayer {
         }
       }
 
+      if (!lines.some(line => Number.isFinite(line.startTime) && line.startTime >= 0
+        && line.words.some(word => word.word.trim().length > 0))) {
+        throw new Error('No readable timed caption lines');
+      }
       this.originalLyricLines = JSON.parse(JSON.stringify(lines));
       this.hasLyrics = lines.length > 0;
       this.updateLyricsDisplay();
@@ -3750,9 +3743,11 @@ class WebLyricsPlayer {
       }
       this.updateLyricAreaHint();
       this.showStatus(`${t("lyricsParseSuccess")}${lines.length} 行`);
+      return true;
     } catch (error) {
       console.error("Lyric parsing error:", error);
       this.showStatus(t("lyricsParseFailed"), true);
+      return false;
     }
   }
 
@@ -4375,6 +4370,12 @@ class WebLyricsPlayer {
   }
 
   private resetPlayer() {
+    ++this.musicLoadId;
+    ++this.lyricLoadId;
+    this.selectedMusicFile = null;
+    this.selectedLyricFile = null;
+    if (this.state.musicUrl.startsWith('blob:')) URL.revokeObjectURL(this.state.musicUrl);
+    if (this.state.lyricUrl.startsWith('blob:')) URL.revokeObjectURL(this.state.lyricUrl);
     this.resetUploadButtons();
     this.audio.pause();
     this.audio.currentTime = 0;
@@ -4940,7 +4941,7 @@ class WebLyricsPlayer {
     this.updateTimeDisplay();
   }
 
-  private async parseAudioMetadata(file: File) {
+  private async parseAudioMetadata(file: File, loadId = this.musicLoadId) {
     try {
       console.log(
         "Parsing audio metadata, file:",
@@ -4955,6 +4956,7 @@ class WebLyricsPlayer {
       if (jsmediatags) {
         jsmediatags.read(file, {
           onSuccess: (tag: any) => {
+            if (loadId !== this.musicLoadId || this.selectedMusicFile !== file) return;
             console.log("Audio metadata parsed successfully, full data:", tag);
             console.log("tags:", tag.tags);
 
@@ -5029,6 +5031,7 @@ class WebLyricsPlayer {
             }
           },
           onError: (error: any) => {
+            if (loadId !== this.musicLoadId || this.selectedMusicFile !== file) return;
             this.showStatus(t("metadataParseFailed"), true);
             this.parseAudioMetadataFallback(file);
           },
