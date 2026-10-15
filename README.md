@@ -35,7 +35,7 @@ Tests generate only synthetic WAV/MP3 and SRT/LRC data in ignored `test-results/
 
 ## Static deployment
 
-`dist/` is self-contained and works under a repository subpath. A GitHub Pages workflow is included. Once a new repository is available, push `main`, set Pages to **GitHub Actions**, and run the workflow. No backend, database, API key, paid service, or analytics is required. This environment has not yet published the project; see the validation report for the authentication blocker.
+`dist/` is self-contained and works under a repository subpath. The existing Vercel Git integration deploys `main` to [amll-speech-player.vercel.app](https://amll-speech-player.vercel.app/). GitHub Actions runs type checks, tests and the production build; it does not deploy. GitHub Pages is not required, and no additional hosting or credentials are needed.
 
 The broken upstream development service worker has been removed. This build does not promise offline caching. The **Source · AGPL-3.0** link downloads the build's corresponding source archive from the same static host, including build/test scripts and the dependency lockfile.
 

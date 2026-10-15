@@ -1,4 +1,5 @@
-name: Test and deploy static player
+# Deployment is handled by the existing Vercel Git integration.
+name: Test and build static player
 on:
   push:
     branches: [main]
@@ -6,7 +7,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: pages
+  group: static-player-ci
   cancel-in-progress: true
 jobs:
   build:
@@ -22,18 +23,3 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm typecheck && pnpm test && pnpm build
-      - uses: actions/upload-pages-artifact@v4
-        with:
-          path: dist
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/deploy-pages@v4
-        id: deployment
