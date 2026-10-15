@@ -1,14 +1,18 @@
 # Glass controls and native lyric preview
 
-Baseline: `a45cd21edf95853e04be2439bf900e5ccfaea4ed`. Changes apply to the audio/caption picker buttons, drag-seek toggle, and local-save summary/panel/actions. Storage implementation, import validation, audio timing and sorting are unchanged.
+Current material correction starts from `5441d715144ea413572d80022b0ef21054e0708c`. It only changes CSS and documentation; storage, imports, audio timing, sorting and the AMLL preview implementation are unchanged.
 
 ## Glass styling
 
-The former dark fills are replaced with pale translucent glass, white highlights and dark plum labels. The active drag toggle has an inset outline as well as its existing 開/關 text and `aria-pressed` state. Error, disabled, keyboard-focus and forced-color states remain visible. Controls retain their existing layout and minimum 44px height.
+The original `index.html` already contained the desired material: `#controlPanel` used a 20%-white-to-transparent gradient, 10px backdrop blur, an 18% white border and its existing shadow; `.btn` used a 10% white fill (20% on hover), the same blur/border, and `--dominant-color-light` text.
 
-Backdrop blur is limited to 10px on the small toolbar controls, summary and open panel. Nested action buttons have translucent fills without an additional blur layer. No blur animation or full-screen filter was added. Both `backdrop-filter` and `-webkit-backdrop-filter` are supplied; [WebKit documents the older prefixed implementation and Safari 18's unprefixed support](https://webkit.org/blog/15443/news-from-wwdc24-webkit-in-safari-18-beta/#backdrop-filter). Without either property, a more opaque pale fill preserves legibility. Reduced-transparency and forced-color modes disable the blur.
+The earlier change did not reuse these values. Its normal path layered a 66% pale base with a 6%-26% white gradient, yielding approximately 68%-75% light coverage before the bright 58% border and inset highlight. Hover and fallback paths were even more opaque. This explains the reported thick pink-white appearance without assuming a Safari failure. The original iPad's active CSS/media-query branch cannot be determined from the screenshot description alone.
 
-The conservative text contrast calculation (base glass over pure black, ignoring the brighter highlight gradient) is 5.37:1 for enabled labels. Screenshots were also inspected over white, black, the actual artwork background and a colored stripe backdrop. The fallback was exercised by removing the feature-query rule in Chromium; this does not constitute a Safari test.
+The original values are now extracted as `--glass-panel-fill`, `--glass-control-fill`, `--glass-control-hover`, `--glass-border`, `--glass-backdrop` and `--glass-panel-shadow`. Original and new controls reference the same values. The added pale base, extra highlight and saturation filter are removed. The open save panel uses the panel material; audio/caption buttons and the summary use the original button material. Inner action buttons add no second blur. The original panel and `.btn` computed styles were compared before/after and remain equal.
+
+The drag toggle retains 開/關 text and `aria-pressed`; a thin underline and slightly stronger border mark the active state without a heavy inset ring. Error, disabled and keyboard-focus states remain visible. Layout and 44px touch targets are preserved. Text follows the existing theme colors, including the existing color-inversion setting for light backgrounds; arbitrary user-selected foreground/background combinations are not guaranteed to meet a fixed contrast ratio.
+
+Both `backdrop-filter` and `-webkit-backdrop-filter` retain the original 10px blur; [WebKit documents the older prefixed implementation and Safari 18's unprefixed support](https://webkit.org/blog/15443/news-from-wwdc24-webkit-in-safari-18-beta/#backdrop-filter). No new blur layers, animation or full-screen filters are introduced. Unsupported-filter and reduced-transparency modes use the existing theme's dark color for a readable fallback, not a pale opaque base. Forced-color mode uses system colors. No native OS menu is modified or reproduced.
 
 ## Existing AMLL integration
 
@@ -20,10 +24,10 @@ Candidate selection still uses cached unscaled top/height values. The library's 
 
 ## Validation and limits
 
-Production-build Chromium checks cover desktop, tablet landscape/portrait and phone landscape/portrait layouts, real file chooser activation, click/touch interaction, Tab/Enter control activation, visible focus, bounds, hit targeting, light/dark backgrounds, disabled/error states and the no-blur/forced-color fallbacks. The existing global Space playback shortcut is unchanged; Enter activates focused toolbar buttons.
+The material correction passed production-build checks at six sizes, including 1536x1067, desktop, tablet landscape/portrait and phone landscape/portrait. Before/after screenshots and red/light/dark scenes were inspected. The light scene uses the app's existing color-inversion control. The checks compare material properties with the original controls, verify 44px bounds/hit targets, Tab/Enter toggle activation, visible focus, active underline, save/clear and error/fallback states. Results: [clear-glass-results.json](results/clear-glass-results.json). The existing global Space playback shortcut is unchanged; Enter activates focused toolbar buttons.
 
 `tests/drag_preview.py` checks native spring progression, a single target, stable cached geometry and visual centre, wrapped text without overlap/clipping, unchanged audio/lyric clocks before release, one seek on release, cleanup on cancellation and retained keyboard focus. It includes desktop, tablet, wrapped phone text and reduced-motion cases. Raw results are in [results](results/).
 
-Typecheck, the production build and all 17 Node tests passed. Production-browser validation passed all 23 local-session cases, four new preview scenarios, five UI sizes, 20 seek-order groups, 84 tap-playback cases, and the existing browser/drag suites, with no page errors. The 2,000-line browser check mounted five rows and measured approximately 0.1ms p95 renderer-update time in this environment; this is not an iPad performance claim. Local-session checks ran after the glass CSS change; gesture, preview, ordering and UI checks ran after the AMLL adapter change.
+For this CSS correction, the production build, all 23 local-session cases, five existing UI/gesture layouts and all four native-preview scenarios passed with no page errors. The previous `5441d71` release also passed typecheck, 17 Node tests, 20 seek-order groups, 84 tap-playback cases and browser/drag regressions; their TypeScript implementation is unchanged here.
 
 All media used is synthetic. Physical iPad/Safari rendering and performance have not been measured; Chromium touch/viewport emulation is not a substitute. Production deployment is correlated using the allowed GitHub commit status and Vercel project summary because direct site access and detailed deployment access were previously denied in this environment.

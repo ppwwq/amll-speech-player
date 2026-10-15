@@ -19,7 +19,7 @@
     #followPlayback { padding: 10px 15px; border: 1px solid #ffffff40; border-radius: 20px; background: #23111dcc; color: #fff; cursor: pointer; min-height: 44px; }
     #practiceToolbar a { color: #fff; margin-left: auto; }
     #practiceToolbar span { opacity: .75; }
-    #localSavePanel { position: fixed; top: max(58px, calc(env(safe-area-inset-top) + 48px)); right: 16px; z-index: 60; color: #302638; font-size: 12px; max-width: calc(100vw - 32px); }
+    #localSavePanel { position: fixed; top: max(58px, calc(env(safe-area-inset-top) + 48px)); right: 16px; z-index: 60; color: var(--dominant-color-light); font-size: 12px; max-width: calc(100vw - 32px); }
     #localSavePanel summary { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 12px; border-radius: 16px; cursor: pointer; list-style: none; }
     #localSavePanel summary::-webkit-details-marker { display: none; }
     #localSavePanel summary::after { content: '▾'; }
@@ -27,42 +27,41 @@
     #localSavePanel .save-details { position: absolute; top: 48px; right: 0; width: 300px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 170px); overflow-y: auto; box-sizing: border-box; padding: 14px; border-radius: 14px; line-height: 1.6; }
     #localSavePanel p { margin: 0 0 12px; }
     #localSavePanel .save-note { color: inherit; font-size: 11px; }
-    #localSavePanel button { min-height: 44px; padding: 8px 12px; margin: 2px 4px 2px 0; border: 1px solid rgb(74 53 88 / 30%); border-radius: 10px; background: rgb(255 255 255 / 26%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 48%); color: inherit; cursor: pointer; }
+    #localSavePanel button { min-height: 44px; padding: 8px 12px; margin: 2px 4px 2px 0; border: 1px solid var(--glass-border); border-radius: 10px; background: var(--glass-control-fill); color: inherit; cursor: pointer; }
     #localSavePanel button:disabled { opacity: .6; cursor: default; }
-    /* Pale glass keeps dark text readable over either light or dark artwork.
-       The higher-opacity base is also the no-backdrop-filter fallback. */
+    /* Share the original .btn / #controlPanel material, without an extra pale
+       base coat or inset highlight. Child actions do not add another blur. */
     #practiceToolbar button, #localSavePanel summary, #localSavePanel .save-details {
-      color: #302638;
-      background-color: rgb(244 237 250 / 94%);
-      background-image: linear-gradient(135deg, rgb(255 255 255 / 26%), rgb(255 255 255 / 6%));
-      border: 1px solid rgb(255 255 255 / 58%);
-      box-shadow: inset 0 1px 0 rgb(255 255 255 / 55%), 0 4px 16px rgb(54 30 66 / 14%);
+      color: var(--dominant-color-light);
+      background: var(--glass-control-fill);
+      border: 1px solid var(--glass-border);
+      -webkit-backdrop-filter: var(--glass-backdrop);
+      backdrop-filter: var(--glass-backdrop);
     }
-    @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-      #practiceToolbar button, #localSavePanel summary, #localSavePanel .save-details {
-        background-color: rgb(244 237 250 / 66%);
-        -webkit-backdrop-filter: blur(10px) saturate(115%);
-        backdrop-filter: blur(10px) saturate(115%);
-      }
+    #localSavePanel .save-details {
+      background: var(--glass-panel-fill);
+      box-shadow: var(--glass-panel-shadow);
     }
     #practiceToolbar #dragSeekMode[aria-pressed="true"] {
-      border-color: #675376;
-      box-shadow: inset 0 0 0 1px #675376, inset 0 2px 0 rgb(255 255 255 / 65%), 0 4px 16px rgb(54 30 66 / 14%);
-      background-image: linear-gradient(135deg, rgb(255 255 255 / 40%), rgb(219 194 238 / 26%));
+      border-color: rgb(255 255 255 / 40%);
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
     }
-    #localSavePanel[data-phase="error"] summary { border-color: #8b414d; box-shadow: inset 0 0 0 1px #8b414d, 0 4px 16px rgb(54 30 66 / 14%); }
+    #localSavePanel[data-phase="error"] summary { border-color: currentColor; }
     #practiceToolbar button:focus-visible, #localSavePanel summary:focus-visible, #localSavePanel button:focus-visible {
-      outline: 2px solid #493452;
+      outline: 2px solid currentColor;
       outline-offset: 3px;
-      box-shadow: 0 0 0 3px rgb(255 255 255 / 90%);
     }
     @media (hover: hover) and (pointer: fine) {
-      #practiceToolbar button:hover, #localSavePanel summary:hover { background-color: rgb(244 237 250 / 82%); }
-      #localSavePanel button:not(:disabled):hover { background-color: rgb(255 255 255 / 48%); }
+      #practiceToolbar button:hover, #localSavePanel summary:hover, #localSavePanel button:not(:disabled):hover { background: var(--glass-control-hover); }
     }
-    #practiceToolbar button:active, #localSavePanel summary:active, #localSavePanel button:not(:disabled):active { border-color: #675376; }
+    #practiceToolbar button:active, #localSavePanel summary:active, #localSavePanel button:not(:disabled):active { border-color: currentColor; }
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+      #practiceToolbar button, #localSavePanel summary, #localSavePanel .save-details { background: var(--dominant-color-dark); }
+    }
     @media (prefers-reduced-transparency: reduce) {
-      #practiceToolbar button, #localSavePanel summary, #localSavePanel .save-details { background-color: rgb(244 237 250 / 96%); -webkit-backdrop-filter: none; backdrop-filter: none; }
+      #practiceToolbar button, #localSavePanel summary, #localSavePanel .save-details { background: var(--dominant-color-dark); -webkit-backdrop-filter: none; backdrop-filter: none; }
     }
     @media (forced-colors: active) {
       #practiceToolbar button, #localSavePanel summary, #localSavePanel .save-details, #localSavePanel button { color: CanvasText; background: Canvas; border-color: ButtonText; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
@@ -93,6 +92,13 @@
       --dominant-color-light: rgb(255, 207, 206);
       --dominant-color-dark: rgb(100, 3, 2);
       --waveform-color: rgb(253, 156, 155);
+      /* Existing panel and .btn material, shared with the practice controls. */
+      --glass-panel-fill: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+      --glass-control-fill: rgba(255, 255, 255, 0.1);
+      --glass-control-hover: rgba(255, 255, 255, 0.2);
+      --glass-border: rgba(255, 255, 255, 0.18);
+      --glass-backdrop: blur(10px);
+      --glass-panel-shadow: 0 20px 25px rgba(0, 0, 0, 0.18), 0 10px 25px rgba(0, 0, 0, 0.18);
     }
 
     body,
@@ -185,11 +191,11 @@
       z-index: 50;
       width: 0px;
       overflow-y: auto;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 20px 25px rgba(0, 0, 0, 0.18), 0 10px 25px rgba(0, 0, 0, 0.18);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: var(--glass-panel-fill);
+      backdrop-filter: var(--glass-backdrop);
+      -webkit-backdrop-filter: var(--glass-backdrop);
+      box-shadow: var(--glass-panel-shadow);
+      border: 1px solid var(--glass-border);
       transition: width 0.25s ease, right 0.25s ease, top 0.25s ease, opacity 0.25s ease;
       opacity: 0;
     }
@@ -232,10 +238,10 @@
     }
 
     .btn {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: var(--glass-control-fill);
+      backdrop-filter: var(--glass-backdrop);
+      -webkit-backdrop-filter: var(--glass-backdrop);
+      border: 1px solid var(--glass-border);
       color: var(--dominant-color-light);
       padding: 8px 16px;
       border-radius: 24px;
@@ -250,7 +256,7 @@
     }
 
     .btn:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: var(--glass-control-hover);
     }
 
     @keyframes marquee {

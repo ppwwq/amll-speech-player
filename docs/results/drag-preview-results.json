@@ -1,21 +1,21 @@
 {
   "cases": {
     "desktop": {
-      "early_scale": 1.0279,
+      "early_scale": 1.0295,
       "settled_scale": 1.03,
       "stable_layout_no_early_seek": true,
       "release_once_cancel_cleans": true,
       "keyboard_focus_retained": true
     },
     "tablet": {
-      "early_scale": 1.0288,
+      "early_scale": 1.0297,
       "settled_scale": 1.03,
       "stable_layout_no_early_seek": true,
       "release_once_cancel_cleans": true,
       "keyboard_focus_retained": true
     },
     "phone-wrapped": {
-      "early_scale": 1.0279,
+      "early_scale": 1.0288,
       "settled_scale": 1.03,
       "stable_layout_no_early_seek": true,
       "release_once_cancel_cleans": true,

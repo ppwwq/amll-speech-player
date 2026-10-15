@@ -1,0 +1,593 @@
+{
+  "viewports": {
+    "ipad-reference": {
+      "material": {
+        "originalPanel": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "image": "linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0))",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "rgba(0, 0, 0, 0.18) 0px 20px 25px 0px, rgba(0, 0, 0, 0.18) 0px 10px 25px 0px"
+        },
+        "originalButton": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "savePanel": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "image": "linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0))",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "rgba(0, 0, 0, 0.18) 0px 20px 25px 0px, rgba(0, 0, 0, 0.18) 0px 10px 25px 0px"
+        },
+        "audio": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "summary": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "childBlur": "none"
+      },
+      "controls": [
+        {
+          "selector": "#openPracticeAudio",
+          "x": 112.46875,
+          "y": 10,
+          "w": 96.453125,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#openPracticeLyrics",
+          "x": 218.921875,
+          "y": 10,
+          "w": 114.96875,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#dragSeekMode",
+          "x": 343.890625,
+          "y": 10,
+          "w": 111.96875,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#localSavePanel summary",
+          "x": 1411.296875,
+          "y": 58,
+          "w": 108.703125,
+          "h": 46,
+          "hit": true
+        },
+        {
+          "selector": "#saveLocalSession",
+          "x": 1235,
+          "y": 218.96875,
+          "w": 145.953125,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#clearLocalSession",
+          "x": 1388.296875,
+          "y": 218.96875,
+          "w": 105.96875,
+          "h": 44,
+          "hit": true
+        }
+      ],
+      "original_material_unchanged": true,
+      "toggle_keyboard_save_clear": true
+    },
+    "desktop": {
+      "material": {
+        "originalPanel": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "image": "linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0))",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "rgba(0, 0, 0, 0.18) 0px 20px 25px 0px, rgba(0, 0, 0, 0.18) 0px 10px 25px 0px"
+        },
+        "originalButton": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "savePanel": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "image": "linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0))",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "rgba(0, 0, 0, 0.18) 0px 20px 25px 0px, rgba(0, 0, 0, 0.18) 0px 10px 25px 0px"
+        },
+        "audio": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "summary": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "childBlur": "none"
+      },
+      "controls": [
+        {
+          "selector": "#openPracticeAudio",
+          "x": 112.46875,
+          "y": 10,
+          "w": 96.453125,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#openPracticeLyrics",
+          "x": 218.921875,
+          "y": 10,
+          "w": 114.96875,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#dragSeekMode",
+          "x": 343.890625,
+          "y": 10,
+          "w": 111.96875,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#localSavePanel summary",
+          "x": 1155.296875,
+          "y": 58,
+          "w": 108.703125,
+          "h": 46,
+          "hit": true
+        },
+        {
+          "selector": "#saveLocalSession",
+          "x": 979,
+          "y": 218.96875,
+          "w": 145.953125,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#clearLocalSession",
+          "x": 1132.296875,
+          "y": 218.96875,
+          "w": 105.96875,
+          "h": 44,
+          "hit": true
+        }
+      ],
+      "original_material_unchanged": true,
+      "toggle_keyboard_save_clear": true
+    },
+    "tablet-landscape": {
+      "material": {
+        "originalPanel": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "image": "linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0))",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "rgba(0, 0, 0, 0.18) 0px 20px 25px 0px, rgba(0, 0, 0, 0.18) 0px 10px 25px 0px"
+        },
+        "originalButton": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "savePanel": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "image": "linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0))",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "rgba(0, 0, 0, 0.18) 0px 20px 25px 0px, rgba(0, 0, 0, 0.18) 0px 10px 25px 0px"
+        },
+        "audio": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "summary": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "childBlur": "none"
+      },
+      "controls": [
+        {
+          "selector": "#openPracticeAudio",
+          "x": 16,
+          "y": 10,
+          "w": 96.453125,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#openPracticeLyrics",
+          "x": 122.453125,
+          "y": 10,
+          "w": 114.96875,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#dragSeekMode",
+          "x": 247.421875,
+          "y": 10,
+          "w": 111.96875,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#localSavePanel summary",
+          "x": 899.296875,
+          "y": 58,
+          "w": 108.703125,
+          "h": 46,
+          "hit": true
+        },
+        {
+          "selector": "#saveLocalSession",
+          "x": 723,
+          "y": 218.96875,
+          "w": 145.953125,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#clearLocalSession",
+          "x": 876.296875,
+          "y": 218.96875,
+          "w": 105.96875,
+          "h": 44,
+          "hit": true
+        }
+      ],
+      "original_material_unchanged": true,
+      "toggle_keyboard_save_clear": true
+    },
+    "tablet-portrait": {
+      "material": {
+        "originalPanel": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "image": "linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0))",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "rgba(0, 0, 0, 0.18) 0px 20px 25px 0px, rgba(0, 0, 0, 0.18) 0px 10px 25px 0px"
+        },
+        "originalButton": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "savePanel": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "image": "linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0))",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "rgba(0, 0, 0, 0.18) 0px 20px 25px 0px, rgba(0, 0, 0, 0.18) 0px 10px 25px 0px"
+        },
+        "audio": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "summary": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "childBlur": "none"
+      },
+      "controls": [
+        {
+          "selector": "#openPracticeAudio",
+          "x": 16,
+          "y": 10,
+          "w": 96.453125,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#openPracticeLyrics",
+          "x": 122.453125,
+          "y": 10,
+          "w": 114.96875,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#dragSeekMode",
+          "x": 247.421875,
+          "y": 10,
+          "w": 111.96875,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#localSavePanel summary",
+          "x": 643.296875,
+          "y": 58,
+          "w": 108.703125,
+          "h": 46,
+          "hit": true
+        },
+        {
+          "selector": "#saveLocalSession",
+          "x": 467,
+          "y": 218.96875,
+          "w": 145.953125,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#clearLocalSession",
+          "x": 620.296875,
+          "y": 218.96875,
+          "w": 105.96875,
+          "h": 44,
+          "hit": true
+        }
+      ],
+      "original_material_unchanged": true,
+      "toggle_keyboard_save_clear": true
+    },
+    "phone": {
+      "material": {
+        "originalPanel": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "image": "linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0))",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "rgba(0, 0, 0, 0.18) 0px 20px 25px 0px, rgba(0, 0, 0, 0.18) 0px 10px 25px 0px"
+        },
+        "originalButton": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "savePanel": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "image": "linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0))",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "rgba(0, 0, 0, 0.18) 0px 20px 25px 0px, rgba(0, 0, 0, 0.18) 0px 10px 25px 0px"
+        },
+        "audio": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "summary": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "childBlur": "none"
+      },
+      "controls": [
+        {
+          "selector": "#openPracticeAudio",
+          "x": 8,
+          "y": 10,
+          "w": 86.453125,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#openPracticeLyrics",
+          "x": 99.453125,
+          "y": 10,
+          "w": 104.96875,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#dragSeekMode",
+          "x": 209.421875,
+          "y": 10,
+          "w": 101.96875,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#localSavePanel summary",
+          "x": 265.296875,
+          "y": 58,
+          "w": 108.703125,
+          "h": 46,
+          "hit": true
+        },
+        {
+          "selector": "#saveLocalSession",
+          "x": 89,
+          "y": 218.96875,
+          "w": 145.953125,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#clearLocalSession",
+          "x": 242.296875,
+          "y": 218.96875,
+          "w": 105.96875,
+          "h": 44,
+          "hit": true
+        }
+      ],
+      "original_material_unchanged": true,
+      "toggle_keyboard_save_clear": true
+    },
+    "phone-landscape": {
+      "material": {
+        "originalPanel": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "image": "linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0))",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "rgba(0, 0, 0, 0.18) 0px 20px 25px 0px, rgba(0, 0, 0, 0.18) 0px 10px 25px 0px"
+        },
+        "originalButton": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "savePanel": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(0, 0, 0, 0)",
+          "image": "linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0))",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "rgba(0, 0, 0, 0.18) 0px 20px 25px 0px, rgba(0, 0, 0, 0.18) 0px 10px 25px 0px"
+        },
+        "audio": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "summary": {
+          "color": "rgb(255, 207, 206)",
+          "bg": "rgba(255, 255, 255, 0.1)",
+          "image": "none",
+          "border": "rgba(255, 255, 255, 0.18)",
+          "blur": "blur(10px)",
+          "shadow": "none"
+        },
+        "childBlur": "none"
+      },
+      "controls": [
+        {
+          "selector": "#openPracticeAudio",
+          "x": 16,
+          "y": 10,
+          "w": 96.453125,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#openPracticeLyrics",
+          "x": 122.453125,
+          "y": 10,
+          "w": 114.96875,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#dragSeekMode",
+          "x": 247.421875,
+          "y": 10,
+          "w": 111.96875,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#localSavePanel summary",
+          "x": 719.296875,
+          "y": 58,
+          "w": 108.703125,
+          "h": 46,
+          "hit": true
+        },
+        {
+          "selector": "#saveLocalSession",
+          "x": 543,
+          "y": 218.96875,
+          "w": 145.953125,
+          "h": 44,
+          "hit": true
+        },
+        {
+          "selector": "#clearLocalSession",
+          "x": 696.296875,
+          "y": 218.96875,
+          "w": 105.96875,
+          "h": 44,
+          "hit": true
+        }
+      ],
+      "original_material_unchanged": true,
+      "toggle_keyboard_save_clear": true
+    }
+  },
+  "page_errors": [],
+  "reference": "User-provided iPad screenshot description and original CSS. Library read returned image metadata/pointer; pixel materialization helper became unavailable.",
+  "fallback": {
+    "bg": "rgb(100, 3, 2)",
+    "blur": "none"
+  },
+  "limits": "Real Chromium; simulated touch/viewports and fallback. Light scene uses the existing color-inversion setting. No physical iPad/Safari rendering measurement or claim of native-system material equivalence."
+}
