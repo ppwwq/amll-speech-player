@@ -103,3 +103,27 @@ Final local checks:
 The existing Vercel project was identified as `prj_ep1uPLZbO9uJrP1wzqWkFujn7V1s`. Project basics are readable; its detailed deployment API returned 403 for the existing account scope, and no Vercel CLI is installed. No credential or permission change was attempted. GitHub Vercel commit status and public asset/browser checks are the available post-push verification route; their final outcome is reported with the delivery commit.
 
 Still unverified: physical iPad, Safari/WebKit, the user's unprovided video/LRC, audio hardware latency and unbounded transcript size. Only synthetic audio/LRC was used. The pinned-core internal API dependency remains documented; this patch does not upgrade packages.
+
+## Transcript playback taps and compact drag time — 2026-10-15
+
+Baseline: `3c0d5a3d46648f05a44ac8728ab712668976765e`, freshly cloned from the existing `ppwwq/amll-speech-player` main into `/workspace/amll-speech-player-tap`. The parser and seek-order rendering repair are retained. No dependency upgrade, private media, new repository/project, or smoke-notes modification is involved.
+
+The user story is local synthetic audio/subtitle import → mouse or native Chromium touch → existing pointer state machine → media play/pause or shared seek → rendered playback state. This is a static client flow; there is no application API/database.
+
+### Behavior
+
+- A qualifying single tap on a sentence or transcript whitespace waits 320ms before toggling playback. The same double-tap window constant is shared with existing same-sentence/24px pairing. A second pointer-down suspends the pending single; a qualifying pair only seeks, preserving playback. Compatibility clicks do not activate twice.
+- Dragging (including returning to the starting point), long holds, cancellation/capture loss, multi-touch inside or outside the transcript, outside release, wheel browsing, blur/hidden page, resize, mode/media/delay/subtitle changes, follow/reset and disposal discard pending taps. A valid drag release still seeks once, preserving playback. Native controls, forms, editable fields and ARIA sliders/buttons are excluded; keyboard seeking on actual transcript rows is retained. No valid audio means no play attempt.
+- The drag badge contains only offset-corrected `mm:ss.mmm`, with a compact 55%-opaque background and fully opaque white text. The transcript opacity remains unchanged. Invalid/outside/no-media candidates have no time badge or instruction text.
+
+### Verification
+
+- Strict TypeScript and 9 Node regression groups pass. The existing build warnings about the classic metadata script and >500KB bundle remain.
+- `tests/browser.py` and `tests/drag_seek.py` pass against the production build served by a plain static HTTP server at `http://127.0.0.1:4173/`, with zero page errors. The 2000-line sample has 5 mounted/animated rows; update p95 was about 0.1ms (container JS timing, not device FPS).
+- `tests/seek_order.py`: 20/20 groups pass across desktop, tablet landscape/portrait and narrow phone. Its former single-tap-inert setup now explicitly checks playback, then pauses before testing paused seek geometry. Bidirectional seeks, duplicates/order, delays, active rows and stale springs remain covered.
+- `tests/ui_checks.py`: all 5 viewports pass (1280×900, 1024×768, 768×1024, 390×844, 844×390), including synthetic MP3/LRC, single resume/pause, double tap, time-only translucent badge bounds/contrast, and exactly one drag-release seek. Portrait phone/tablet and phone-landscape drag screenshots were visually reviewed.
+- `tests/tap_playback.py`: 84/84 cases pass, with zero page/playback-console errors. It covers delayed single taps on rows/whitespace, pairs/triples, pending-single followed by drag/long hold/cancellation, paused/playing state, native mouse/touch, controls and unloaded media. It runs without an autoplay-policy override. Raw results are saved with the other suites in `docs/results/`.
+
+The available Vercel `verification` and `deployments-cicd` skills were read and applied. The existing project was confirmed as `prj_ep1uPLZbO9uJrP1wzqWkFujn7V1s` under `team_8xRXiaV0EfXXQbrntMCWZeNy`, using Vite and the original production domain. Release/production-access outcome is reported with the delivery commit rather than assumed from local tests.
+
+Limits: Chromium Linux and touch emulation only; physical iPad/Safari/WebKit, audio hardware and user-private recordings are untested. No previous website-access investigation was resumed, and no access/protection setting was changed.

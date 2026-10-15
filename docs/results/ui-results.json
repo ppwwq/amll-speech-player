@@ -60,7 +60,17 @@
     },
     "mounted": 6,
     "bodyWidth": 1280,
-    "mp3_lrc_double_tap_and_drag_seek": true
+    "mp3_lrc_single_double_tap_and_drag_seek": true,
+    "drag_time_badge": {
+      "x": 536,
+      "y": 414.703125,
+      "w": 83.0625,
+      "h": 32.296875,
+      "bg": "rgba(39, 19, 38, 0.55)",
+      "color": "rgb(255, 255, 255)",
+      "opacity": "1",
+      "playerOpacity": "1"
+    }
   },
   "landscape": {
     "controls": [
@@ -123,7 +133,17 @@
     },
     "mounted": 6,
     "bodyWidth": 1024,
-    "mp3_lrc_double_tap_and_drag_seek": true
+    "mp3_lrc_single_double_tap_and_drag_seek": true,
+    "drag_time_badge": {
+      "x": 433.59375,
+      "y": 348.703125,
+      "w": 83.0625,
+      "h": 32.296875,
+      "bg": "rgba(39, 19, 38, 0.55)",
+      "color": "rgb(255, 255, 255)",
+      "opacity": "1",
+      "playerOpacity": "1"
+    }
   },
   "portrait": {
     "controls": [
@@ -190,7 +210,17 @@
       "headerClear": true,
       "lyricsClear": true
     },
-    "mp3_lrc_double_tap_and_drag_seek": true
+    "mp3_lrc_single_double_tap_and_drag_seek": true,
+    "drag_time_badge": {
+      "x": 24,
+      "y": 522.703125,
+      "w": 83.0625,
+      "h": 32.296875,
+      "bg": "rgba(39, 19, 38, 0.55)",
+      "color": "rgb(255, 255, 255)",
+      "opacity": "1",
+      "playerOpacity": "1"
+    }
   },
   "narrow": {
     "controls": [
@@ -257,7 +287,90 @@
       "headerClear": true,
       "lyricsClear": true
     },
-    "mp3_lrc_double_tap_and_drag_seek": true
+    "mp3_lrc_single_double_tap_and_drag_seek": true,
+    "drag_time_badge": {
+      "x": 24,
+      "y": 432.703125,
+      "w": 83.0625,
+      "h": 32.296875,
+      "bg": "rgba(39, 19, 38, 0.55)",
+      "color": "rgb(255, 255, 255)",
+      "opacity": "1",
+      "playerOpacity": "1"
+    }
+  },
+  "phone-landscape": {
+    "controls": [
+      {
+        "selector": "#openPracticeAudio",
+        "x": 16,
+        "y": 10,
+        "w": 96.453125,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#openPracticeLyrics",
+        "x": 122.453125,
+        "y": 10,
+        "w": 114.96875,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#dragSeekMode",
+        "x": 247.421875,
+        "y": 10,
+        "w": 111.96875,
+        "h": 44,
+        "unobstructed": true
+      },
+      {
+        "selector": "#practiceToolbar a",
+        "x": 727.28125,
+        "y": 25,
+        "w": 100.71875,
+        "h": 14,
+        "unobstructed": true
+      },
+      {
+        "selector": "#playPauseBtn",
+        "x": 10.204063415527344,
+        "y": 332.0400085449219,
+        "w": 51.91999816894531,
+        "h": 51.91998291015625,
+        "unobstructed": true
+      },
+      {
+        "selector": "#albumCoverContainer",
+        "x": 61.30687713623047,
+        "y": 48.10375213623047,
+        "w": 199.97998046875,
+        "h": 199.97998046875,
+        "unobstructed": true
+      }
+    ],
+    "viewport": {
+      "w": 844,
+      "h": 390
+    },
+    "longText": {
+      "scroll": 506,
+      "client": 506
+    },
+    "mounted": 5,
+    "bodyWidth": 844,
+    "mp3_lrc_single_double_tap_and_drag_seek": true,
+    "drag_time_badge": {
+      "x": 361.59375,
+      "y": 159.703125,
+      "w": 83.0625,
+      "h": 32.296875,
+      "bg": "rgba(39, 19, 38, 0.55)",
+      "color": "rgb(255, 255, 255)",
+      "opacity": "1",
+      "playerOpacity": "1"
+    }
   },
   "page_errors": []
 }

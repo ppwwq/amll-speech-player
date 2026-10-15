@@ -125,7 +125,7 @@ async def main():
    elif kind=='outside':
     await g['cdp'].send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[{'x':g['box']['x']-30,'y':g['y'],'id':0}]})
     await tablet.wait_for_timeout(60)
-    assert 'Release to cancel' in (await candidate(tablet))['label']
+    assert (await candidate(tablet))['label']==''
    elif kind=='delay_change':
     await tablet.evaluate('player.applyLyricDelay(500)')
    elif kind=='resize':
@@ -186,7 +186,7 @@ async def main():
   await tablet.evaluate('player.getAudio().removeAttribute("src");player.getAudio().load()')
   await tablet.wait_for_timeout(100);await tablet.evaluate('window.commits=[];window.seeks=0')
   g=await begin(tablet,True,dy=-70)
-  assert 'Load audio first' in (await candidate(tablet))['label']
+  assert (await candidate(tablet))['label']==''
   await end(tablet,g);await no_commit(tablet)
   results['no_audio_no_seek']=True
 

@@ -2915,13 +2915,16 @@ class WebLyricsPlayer {
   private setupLyricEvents() {
     const seekLine = (startMs: number) => this.seekAudio(audioTimeSeconds(startMs, this.state.lyricDelay), true);
     this.lyricPlayer.addEventListener("line-activate", evt => seekLine((evt as CustomEvent<number>).detail));
+    this.lyricPlayer.addEventListener('playback-toggle', () => {
+      if (this.audio.currentSrc && Number.isFinite(this.audio.duration) && this.audio.duration > 0) this.togglePlayPause();
+    });
     const dragMode = document.getElementById('dragSeekMode');
     const dragHint = document.getElementById('practiceHint');
     const setDragMode = (enabled: boolean) => {
       this.lyricPlayer.setDragSeekEnabled(enabled);
       dragMode?.setAttribute('aria-pressed', String(enabled));
       if (dragMode) dragMode.textContent = enabled ? '拖動跳播：開' : '拖動跳播：關';
-      if (dragHint) dragHint.textContent = enabled ? '對準中央，放手跳播 · 雙點也可跳播' : '拖動瀏覽 · 雙點跳播';
+      if (dragHint) dragHint.textContent = '單點播放／暫停 · 雙點跳播';
     };
     let enabled = true;
     try { enabled = localStorage.getItem('amll_speech_drag_seek_v1') !== 'false'; } catch { /* Session default works without storage. */ }

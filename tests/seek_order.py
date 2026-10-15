@@ -95,7 +95,7 @@ async def main():
       assert s['anchor']==expected_anchor,s
     results['cases'][name+'_unordered_duplicates_delay_boundaries']=True
    except AssertionError as e: failures.append({'case':name+'_unordered_duplicates_delay_boundaries','detail':str(e)})
-   # Real UI actions remain single-tap inert, double same-line once, drag release once.
+   # Single taps toggle playback without seeking; double/drag seek once while paused.
    await page.evaluate('player.applyLyricDelay(0);player.seekAudio(0)')
    await upload(page,ORDERED);await watch(page)
    try:
@@ -104,6 +104,8 @@ async def main():
     else: await line.click()
     assert (await state(page))['time']==0
     await page.wait_for_timeout(400)
+    assert not (await state(page))['paused']
+    await page.locator('#playPauseBtn').click()
     if touch:
      await line.tap();box=await line.bounding_box();await page.touchscreen.tap(box['x']+box['width']/2,box['y']+box['height']/2)
     else: await line.dblclick(delay=80)

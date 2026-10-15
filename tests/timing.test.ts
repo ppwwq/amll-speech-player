@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { audioTimeSeconds, lyricTimeMs, clampSeek, TapGesture, DoubleTapGesture, dragSeekTime } from '../src/practice/timing.ts';
+import { audioTimeSeconds, lyricTimeMs, clampSeek, TapGesture, DoubleTapGesture, DOUBLE_TAP_WINDOW_MS, dragSeekTime } from '../src/practice/timing.ts';
 
 test('milliseconds/seconds round trip with positive and negative subtitle offset', () => {
   for (const delay of [-1500, 0, 1250]) for (const start of [0, 1234, 62000, 3600000]) {
@@ -43,4 +43,14 @@ test('drag candidate must have a finite timestamp playable after offset conversi
   assert.equal(dragSeekTime(0, 1000, 60), null);
   for (const duration of [NaN, Infinity, 0, -1]) assert.equal(dragSeekTime(12000, 0, duration), null);
   assert.equal(dragSeekTime(12000, NaN, 60), null);
+});
+
+test('double-tap window boundary and cancellation match delayed single-tap arbitration', () => {
+  const g = new DoubleTapGesture();
+  g.accept('line', 0, 0, 0);
+  assert.equal(g.accept('line', 24, 0, DOUBLE_TAP_WINDOW_MS), true);
+  g.accept('line', 0, 0, 1000);
+  assert.equal(g.accept('line', 0, 0, 1000 + DOUBLE_TAP_WINDOW_MS + 1), false);
+  g.reset();
+  assert.equal(g.accept('line', 0, 0, 1400), false);
 });

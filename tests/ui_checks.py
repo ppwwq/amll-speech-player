@@ -1,5 +1,5 @@
 """MP3/LRC import and screenshot/layout checks in Chromium only."""
-import asyncio,json,subprocess
+import asyncio,json,re,subprocess
 from pathlib import Path
 from playwright.async_api import async_playwright
 from browser import OUT,BASE,state
@@ -12,7 +12,7 @@ async def main():
  result={};errors=[]
  async with async_playwright() as p:
   browser=await p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox','--autoplay-policy=no-user-gesture-required'])
-  for name,w,h,touch in [('desktop',1280,900,False),('landscape',1024,768,True),('portrait',768,1024,True),('narrow',390,844,True)]:
+  for name,w,h,touch in [('desktop',1280,900,False),('landscape',1024,768,True),('portrait',768,1024,True),('narrow',390,844,True),('phone-landscape',844,390,True)]:
    page=await browser.new_page(viewport={'width':w,'height':h},has_touch=touch,is_mobile=touch,device_scale_factor=2 if touch else 1)
    page.on('pageerror',lambda e:errors.append(str(e)))
    await page.goto(BASE);await page.wait_for_function('window.player!==undefined')
@@ -24,6 +24,15 @@ async def main():
    await page.wait_for_timeout(800)
    # Use actual input, not the application's seek method, on imported MP3/LRC.
    line=page.locator('.speech-lyrics [aria-label^="Seek to supercalifragilisticexpialidocious"]')
+   # A single actual click/tap waits out the double-tap window, then resumes/pauses.
+   for paused in [False,True]:
+    if touch: await line.tap()
+    else: await line.click()
+    await page.wait_for_timeout(100)
+    assert (await state(page))['paused'] != paused
+    await page.wait_for_timeout(300)
+    assert (await state(page))['paused'] == paused
+   await page.evaluate('player.seekAudio(0)');await page.wait_for_timeout(500)
    if touch:
     await line.tap();box=await line.bounding_box()
     await page.touchscreen.tap(box['x']+box['width']/2,box['y']+box['height']/2)
@@ -58,13 +67,24 @@ async def main():
    g=await begin(page,touch,dy=-120)
    preview=await candidate(page)
    assert preview['visible'] and preview['seconds'] is not None,(name,preview)
+   assert re.fullmatch(r'\d{2,}:\d{2}\.\d{3}',preview['label']),preview
+   assert abs(float(preview['label'].split(':')[0])*60+float(preview['label'].split(':')[1])-preview['seconds'])<.001,preview
+   badge=await page.locator('.drag-seek-label').evaluate('''e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return {x:r.x,y:r.y,w:r.width,h:r.height,bg:s.backgroundColor,color:s.color,opacity:s.opacity,playerOpacity:getComputedStyle(document.querySelector('.speech-lyrics')).opacity}}''')
+   alpha=float(badge['bg'].split(',')[-1].rstrip(')'))
+   assert 0<alpha<1 and badge['color']=='rgb(255, 255, 255)' and badge['opacity']=='1' and badge['playerOpacity']=='1',badge
+   assert 0<=badge['x'] and badge['x']+badge['w']<=w and 0<=badge['y'] and badge['y']+badge['h']<=h and badge['w']<160,badge
+   await page.screenshot(path=str(OUT/f'ui-drag-{name}.png'))
    assert (await state(page))['time']==3
    assert (await counts(page))=={'commits':[],'seeks':0}
    await end(page,g)
    st=await state(page)
    assert st['paused'] and abs(st['time']-preview['seconds'])<.01,(name,st,preview)
    assert (await counts(page))=={'commits':[preview['start']],'seeks':1}
-   layout['mp3_lrc_double_tap_and_drag_seek']=True
+   await page.wait_for_timeout(400)
+   assert (await state(page))['paused']
+   assert (await counts(page))=={'commits':[preview['start']],'seeks':1}
+   layout['mp3_lrc_single_double_tap_and_drag_seek']=True
+   layout['drag_time_badge']=badge
    result[name]=layout
    await page.close()
   await browser.close()

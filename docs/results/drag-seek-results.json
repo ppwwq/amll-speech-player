@@ -3,20 +3,20 @@
     "visible": true,
     "start": 6000,
     "seconds": 6,
-    "label": "00:06.000 \u00b7 \u653e\u624b\u8df3\u64ad \u00b7 Release to seek\nSynthetic sentence 3. Practice clearly."
+    "label": "00:06.000"
   },
   "horizontal_and_other_controls_no_seek": true,
   "touch_playing_positive_delay": {
     "visible": true,
     "start": 6000,
     "seconds": 4.75,
-    "label": "00:04.750 \u00b7 \u653e\u624b\u8df3\u64ad \u00b7 Release to seek\nSynthetic sentence 3. Practice clearly."
+    "label": "00:04.750"
   },
   "touch_paused_negative_delay": {
     "visible": true,
     "start": 6000,
     "seconds": 7,
-    "label": "00:07.000 \u00b7 \u653e\u624b\u8df3\u64ad \u00b7 Release to seek\nSynthetic sentence 3. Practice clearly."
+    "label": "00:07.000"
   },
   "drag_exits_incompatible_range": true,
   "cancel_cancels_selection": true,

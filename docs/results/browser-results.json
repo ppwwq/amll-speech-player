@@ -13,8 +13,8 @@
     ]
   },
   "desktop_playing_double_click": {
-    "time": 6.042772,
-    "lyric": 6032,
+    "time": 6.057411,
+    "lyric": 6019,
     "paused": false,
     "following": true,
     "range": false,
@@ -117,8 +117,8 @@
     ]
   },
   "touch_playing_double_tap": {
-    "time": 6.027425,
-    "lyric": 6017,
+    "time": 6.034804,
+    "lyric": 6022,
     "paused": false,
     "following": true,
     "range": false,
@@ -167,8 +167,8 @@
     "mounted": 5,
     "animated": 5,
     "updateMedianMs": 0,
-    "updateP95Ms": 0.10000000009313226,
-    "loadSeconds": 6.154
+    "updateP95Ms": 0.1000000000349246,
+    "loadSeconds": 8.236
   },
   "static_assets_and_source_download": true,
   "page_errors": []

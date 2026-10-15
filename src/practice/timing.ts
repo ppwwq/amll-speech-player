@@ -29,12 +29,14 @@ export class TapGesture {
   isTap(now: number) { return !this.moved && now - this.startedAt <= 450; }
 }
 
+export const DOUBLE_TAP_WINDOW_MS = 320;
+
 /** A pair must hit the same sentence, within 320ms and 24px. Each pair is consumed once. */
 export class DoubleTapGesture {
   private previous: { key: unknown; x: number; y: number; time: number } | null = null;
   accept(key: unknown, x: number, y: number, time: number): boolean {
     const p = this.previous;
-    if (p && p.key === key && time - p.time <= 320 && Math.hypot(x - p.x, y - p.y) <= 24) {
+    if (p && p.key === key && time - p.time <= DOUBLE_TAP_WINDOW_MS && Math.hypot(x - p.x, y - p.y) <= 24) {
       this.previous = null;
       return true;
     }

@@ -1,5 +1,5 @@
 import { DomLyricPlayer, type LyricLine } from '@applemusic-like-lyrics/core';
-import { TapGesture, DoubleTapGesture, dragSeekTime } from './timing';
+import { TapGesture, DoubleTapGesture, DOUBLE_TAP_WINDOW_MS, dragSeekTime } from './timing';
 
 type Line = DomLyricPlayer['currentLyricLineObjects'][number];
 // Runtime fields of pinned alpha.5, omitted from its declarations by @internal.
@@ -38,6 +38,7 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
   private dragScrollBounds: [number, number] | null = null;
   private gesture = new TapGesture();
   private doubleTap = new DoubleTapGesture();
+  private singleTapTimer = 0;
   private animated = new Set<Line>();
   private targetTop = new WeakMap<Line, number>();
   private events = new AbortController();
@@ -49,7 +50,7 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
     const el = this.getElement();
     el.classList.add('speech-lyrics');
     el.style.touchAction = 'none';
-    el.setAttribute('aria-label', 'Speech transcript. Drag to the centre guide and release to seek, or double-tap a sentence.');
+    el.setAttribute('aria-label', 'Speech transcript. Tap to play/pause; double-tap a sentence or drag to the centre guide and release to seek.');
     this.dragGuide.className = 'drag-seek-guide';
     this.dragGuide.hidden = true;
     this.dragLabel.className = 'drag-seek-label';
@@ -64,17 +65,21 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
     el.addEventListener('pointercancel', this.onPointerCancel, opts);
     el.addEventListener('lostpointercapture', this.onPointerCancel, opts);
     el.addEventListener('wheel', this.onWheel, { ...opts, passive: false });
-    window.addEventListener('resize', () => { if (this.pointer) this.cancelPointer(); }, opts);
-    window.addEventListener('blur', () => { if (this.pointer) this.cancelPointer(); }, opts);
+    window.addEventListener('resize', () => this.cancelPointer(), opts);
+    window.addEventListener('blur', () => this.cancelPointer(), opts);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) this.cancelPointer(); }, opts);
     document.addEventListener('pointerdown', e => {
       if (this.pointer && e.pointerType === 'touch' && e.pointerId !== this.pointer.id) this.cancelPointer();
+      if (!(e.target instanceof Node) || !el.contains(e.target) || this.isControl(e.target)) this.cancelTap();
     }, { ...opts, capture: true });
     // Pointer activation is handled once on release; suppress compatibility clicks.
     el.addEventListener('click', (e) => {
-      if (e.detail !== 0) { e.preventDefault(); e.stopImmediatePropagation(); }
+      if (e.detail !== 0 && !this.isControl(e.target)) { e.preventDefault(); e.stopImmediatePropagation(); }
     }, { ...opts, capture: true });
     el.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
+      if (this.isControl(e.target)) return;
+      this.cancelTap();
       const line = this.lineAt(e.target);
       if (line) { e.preventDefault(); e.stopPropagation(); this.activate(line); }
     }, opts);
@@ -84,16 +89,18 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
   get isDragSeekEnabled() { return this.dragSeekEnabled; }
 
   setDragSeekEnabled(enabled: boolean) {
+    this.cancelTap();
     if (this.pointer) this.cancelPointer();
     this.dragSeekEnabled = enabled;
     this.element.setAttribute('aria-label', enabled
-      ? 'Speech transcript. Drag to the centre guide and release to seek, or double-tap a sentence.'
-      : 'Speech transcript. Drag to browse; double-tap a sentence to seek.');
+      ? 'Speech transcript. Tap to play/pause; double-tap a sentence or drag to the centre guide and release to seek.'
+      : 'Speech transcript. Tap to play/pause; drag to browse; double-tap a sentence to seek.');
   }
 
   setSeekContext(duration: number, delayMs: number) {
     if (Object.is(duration, this.seekDuration) && delayMs === this.lyricDelayMs) return;
     // A changed recording, delay or duration invalidates a gesture already in progress.
+    this.cancelTap();
     if (this.pointer) this.cancelPointer();
     this.seekDuration = duration;
     this.lyricDelayMs = delayMs;
@@ -131,22 +138,36 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
       this.previewLine?.getElement().setAttribute('data-drag-candidate', 'true');
     }
     const candidate = this.dragCandidate;
-    let label = !p.inside ? '已離開字幕區，放手取消 · Release to cancel'
-      : !Number.isFinite(this.seekDuration) || this.seekDuration <= 0 ? '先載入音訊 · Load audio first'
-      : '此句沒有可跳播時間 · No playable timestamp';
+    let label = '';
     if (candidate) {
       const ms = Math.round(candidate.seconds * 1000);
       const time = `${String(Math.floor(ms / 60000)).padStart(2, '0')}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}.${String(ms % 1000).padStart(3, '0')}`;
-      const text = candidate.line.getLine().words.map(word => word.word).join('');
-      label = `${time} · 放手跳播 · Release to seek
-${text}`;
+      label = time;
       this.dragGuide.dataset.startMs = String(candidate.line.getLine().startTime);
       this.dragGuide.dataset.audioSeconds = String(candidate.seconds);
     } else {
       delete this.dragGuide.dataset.startMs;
       delete this.dragGuide.dataset.audioSeconds;
     }
+    this.dragLabel.hidden = !candidate;
     if (this.dragLabel.textContent !== label) this.dragLabel.textContent = label;
+  }
+
+  private isControl(target: EventTarget | null): boolean {
+    let el = target instanceof Element ? target : null;
+    while (el && el !== this.element) {
+      // Transcript rows themselves have role=button for keyboard seeking.
+      if (this.lyricLineElementMap.has(el)) return false;
+      if (el.matches('a, button, input, select, textarea, form, label, summary, [role="button"], [role="slider"], [role="switch"], [role="checkbox"], [role="textbox"], [contenteditable]:not([contenteditable="false"])')) return true;
+      el = el.parentElement;
+    }
+    return false;
+  }
+
+  private cancelTap() {
+    clearTimeout(this.singleTapTimer);
+    this.singleTapTimer = 0;
+    this.doubleTap.reset();
   }
 
   private lineAt(target: EventTarget | null): Line | undefined {
@@ -164,8 +185,11 @@ ${text}`;
 
   private onPointerDown = (e: PointerEvent) => {
     if (!e.isPrimary) { this.cancelPointer(); return; }
-    if (e.button !== 0) return;
-    if (e.target instanceof Element && e.target.closest('a, button, input, select, textarea')) return;
+    if (e.button !== 0 || this.isControl(e.target)) { this.cancelTap(); return; }
+    // Hold the first tap while another pointer is down: a long press or drag
+    // must not let its pending playback action fire partway through the gesture.
+    clearTimeout(this.singleTapTimer);
+    this.singleTapTimer = 0;
     cancelAnimationFrame(this.inertia);
     clearTimeout(this.followTimer);
     this.gesture.begin(e.clientX, e.clientY, e.timeStamp);
@@ -183,6 +207,7 @@ ${text}`;
     const p = this.pointer;
     if (!p || p.id !== e.pointerId) return;
     this.gesture.move(e.clientX, e.clientY);
+    if (this.gesture.moved) this.cancelTap();
     p.inside = e.clientX >= p.bounds.left && e.clientX <= p.bounds.right &&
       e.clientY >= p.bounds.top && e.clientY <= p.bounds.bottom;
     if (!p.dragging) {
@@ -194,7 +219,7 @@ ${text}`;
       if (!p.eligible) p.seek = false;
       p.dragging = true;
     }
-    this.doubleTap.reset();
+    this.cancelTap();
     this.beginManual();
     const dy = p.y - e.clientY;
     p.velocity = dy / Math.max(1, e.timeStamp - p.time);
@@ -219,20 +244,31 @@ ${text}`;
     if (this.element.hasPointerCapture(e.pointerId)) this.element.releasePointerCapture(e.pointerId);
     this.hideDragPreview();
     if (selected) {
-      this.doubleTap.reset();
+      this.cancelTap();
       this.activate(selected); // Exactly one commit; never run inertia in seek mode.
-    } else if (this.gesture.isTap(e.timeStamp) && p.line && p.inside) {
-      if (this.doubleTap.accept(p.line, e.clientX, e.clientY, e.timeStamp)) this.activate(p.line);
+    } else if (this.gesture.isTap(e.timeStamp) && p.inside) {
+      if (this.doubleTap.accept(p.line ?? this.element, e.clientX, e.clientY, e.timeStamp)) {
+        this.cancelTap();
+        if (p.line) this.activate(p.line);
+      } else {
+        this.singleTapTimer = window.setTimeout(() => {
+          this.cancelTap();
+          this.dispatchEvent(new Event('playback-toggle'));
+        }, DOUBLE_TAP_WINDOW_MS);
+      }
     } else {
-      this.doubleTap.reset();
+      this.cancelTap();
       if (p.dragging && !p.seek && e.timeStamp - p.time < 100) this.startInertia(p.velocity);
     }
     this.scheduleFollow();
   };
 
-  private onPointerCancel = () => { if (this.pointer) this.cancelPointer(); };
+  private onPointerCancel = (e: PointerEvent) => {
+    // Normal release also loses capture, after the single-tap timer is armed.
+    if (this.pointer || e.type === 'pointercancel') this.cancelPointer();
+  };
   private cancelPointer() {
-    this.doubleTap.reset();
+    this.cancelTap();
     const p = this.pointer;
     this.pointer = null;
     this.hideDragPreview();
@@ -252,7 +288,7 @@ ${text}`;
   };
 
   private beginManual() {
-    this.doubleTap.reset();
+    this.cancelTap();
     clearTimeout(this.followTimer);
     if (this.manual) return;
     this.manual = true;
@@ -290,7 +326,7 @@ ${text}`;
   override resetScroll() {
     if (this.pointer) this.cancelPointer();
     this.hideDragPreview();
-    this.doubleTap.reset();
+    this.cancelTap();
     cancelAnimationFrame(this.inertia);
     clearTimeout(this.followTimer);
     this.manual = false;
@@ -414,6 +450,7 @@ ${text}`;
   }
 
   override dispose() {
+    this.cancelTap();
     if (this.pointer) this.cancelPointer();
     this.events.abort();
     cancelAnimationFrame(this.layoutFrame);

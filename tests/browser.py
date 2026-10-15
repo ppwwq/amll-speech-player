@@ -60,6 +60,8 @@ async def main():
   await desktop.locator('.speech-lyrics [aria-label^="Seek to Synthetic sentence 2."]').click()
   assert (await state(desktop))['time']==0
   await desktop.wait_for_timeout(400)
+  assert not (await state(desktop))['paused']
+  await desktop.locator('#playPauseBtn').click()
   await tapline(desktop,1)
   st=await state(desktop);assert abs(st['time']-3)<.05 and st['paused'] and 1 in st['hot'] and 1 in st['visualActive'],st
   results['desktop_paused_double_click']=st
@@ -103,6 +105,8 @@ async def main():
   await tablet.locator('.speech-lyrics [aria-label^="Seek to Synthetic sentence 2."]').tap()
   assert (await state(tablet))['time']==0
   await tablet.wait_for_timeout(400)
+  assert not (await state(tablet))['paused']
+  await tablet.locator('#playPauseBtn').tap()
   await tapline(tablet,1,True)
   st=await state(tablet);assert st['time']==3 and st['paused'],st
   assert await tablet.evaluate('window.activations')==1
@@ -142,19 +146,22 @@ async def main():
   count=await tablet.evaluate('window.activations')
   await cdp.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':x,'y':y,'id':0}]})
   await cdp.send('Input.dispatchTouchEvent',{'type':'touchCancel','touchPoints':[]})
-  await tablet.touchscreen.tap(x,y)
+  await tablet.wait_for_timeout(400)
+  assert (await state(tablet))['paused']
   assert await tablet.evaluate('window.activations')==count
   await tablet.wait_for_timeout(400)
   await cdp.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':x,'y':y,'id':0}]})
   await tablet.wait_for_timeout(550)
   await cdp.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]})
-  await tablet.touchscreen.tap(x,y)
+  await tablet.wait_for_timeout(400)
+  assert (await state(tablet))['paused']
   assert await tablet.evaluate('window.activations')==count
   await tablet.wait_for_timeout(400)
   await cdp.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':x,'y':y,'id':0}]})
   await cdp.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':x,'y':y,'id':0},{'x':x+40,'y':y+40,'id':1}]})
   await cdp.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]})
-  await tablet.touchscreen.tap(x,y)
+  await tablet.wait_for_timeout(400)
+  assert (await state(tablet))['paused']
   assert await tablet.evaluate('window.activations')==count
   assert (await state(tablet))['time']==0
   results['cancel_long_press_multitouch_no_seek']=True
