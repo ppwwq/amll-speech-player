@@ -1,0 +1,23 @@
+{
+  "cases": {
+    "all_controls_autosave_reload_no_initial_overwrite": {
+      "controls": 48,
+      "preference_fields": 49,
+      "paused_media_position_delay_restored": true
+    },
+    "browser_restart_restores_settings_and_complete_media_paused": true,
+    "restored_double_tap_and_same_sentence_drag_save_position": true,
+    "existing_glass_save_panel_mobile_bounds": true,
+    "url_override_is_visit_only_and_survives_media_restore": true,
+    "end_position_restores_paused_even_with_repeat_enabled": true,
+    "clear_files_keeps_preferences_and_reset_restores_defaults": true,
+    "legacy_migration_zero_false_and_first_edit": true,
+    "invalid_fields_keep_valid_values_and_recover": true,
+    "corrupt_json_recovery_and_future_schema_preservation": true,
+    "quota_keeps_previous_record_and_next_change_retries": true,
+    "unavailable_storage_keeps_player_usable": true
+  },
+  "page_errors": [],
+  "non_read_requests": [],
+  "limits": "Local production build, Chromium desktop/touch and persistent-profile restart; no physical iPad Safari."
+}

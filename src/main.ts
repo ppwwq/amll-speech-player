@@ -44,6 +44,7 @@ import { SpeechLyricPlayer } from "./practice/speech-lyric-player";
 import { audioTimeSeconds, lyricTimeMs, clampSeek } from "./practice/timing";
 
 import { LocalSessionMemory, IndexedDBSessionStore, CorruptSessionError, type SavedCaptions, type SaveStatus } from "./practice/local-session";
+import { PreferenceMemory, PREFERENCE_DEFAULTS, validControlPointCode, type Preferences, type PreferenceStatus } from "./practice/preferences";
 
 interface PlayerState {
   musicUrl: string;
@@ -108,6 +109,9 @@ interface PlayerState {
 }
 
 class WebLyricsPlayer {
+  private preferencesReady = false;
+  private appliedControlPointCode = '';
+  private preferenceMemory = new PreferenceMemory(() => localStorage, status => this.renderPreferenceStatus(status));
   private audio: HTMLAudioElement;
   private lyricPlayer: SpeechLyricPlayer;
   private background: BackgroundRender<PixiRenderer | MeshGradientRenderer>;
@@ -722,8 +726,8 @@ class WebLyricsPlayer {
     this.springScaleMassValue = document.getElementById('springScaleMassValue') as HTMLElement;
     this.springScaleDampingValue = document.getElementById('springScaleDampingValue') as HTMLElement;
     this.springScaleStiffnessValue = document.getElementById('springScaleStiffnessValue') as HTMLElement;
-    this.posYSpringSoftCheckbox = document.getElementById('posYSpringSoft') as HTMLInputElement;
-    this.scaleSpringSoftCheckbox = document.getElementById('scaleSpringSoft') as HTMLInputElement;
+    this.posYSpringSoftCheckbox = document.getElementById('springPosYSoft') as HTMLInputElement;
+    this.scaleSpringSoftCheckbox = document.getElementById('springScaleSoft') as HTMLInputElement;
     this.controlPointCodeInput = document.getElementById('controlPointCode') as HTMLInputElement;
     this.amllLyricPlayer = document.getElementById('amll-lyric-player');
     this.lyricAreaHint = document.getElementById('lyricAreaHint');
@@ -940,6 +944,7 @@ class WebLyricsPlayer {
       this.timeDisplay.addEventListener("click", () => {
         this.state.showRemainingTime = !this.state.showRemainingTime;
         this.updateTimeDisplay();
+        this.saveBackgroundSettings();
       });
       this.timeDisplay.style.cursor = "pointer";
     }
@@ -948,6 +953,7 @@ class WebLyricsPlayer {
       this.landscapeTimeDisplay.addEventListener("click", () => {
         this.state.showRemainingTime = !this.state.showRemainingTime;
         this.updateTimeDisplay();
+        this.saveBackgroundSettings();
       });
       this.landscapeTimeDisplay.style.cursor = "pointer";
     }
@@ -1274,6 +1280,8 @@ class WebLyricsPlayer {
 
     this.invertColorsCheckbox?.addEventListener('change', (e) => {
       this.invertColors((e.target as HTMLInputElement).checked);
+      this.state.originalInvertColors = this.state.invertColors;
+      this.saveBackgroundSettings();
     });
 
     this.dominantColorInput?.addEventListener('change', () => this.onDominantColorChange());
@@ -1714,6 +1722,7 @@ class WebLyricsPlayer {
     this.loopPlayCheckbox
       ?.addEventListener("change", (e) => {
         this.state.loopPlay = (e.target as HTMLInputElement).checked;
+        this.saveBackgroundSettings();
       });
 
     if (this.playbackRateControl && this.playbackRateValue) {
@@ -1721,10 +1730,12 @@ class WebLyricsPlayer {
         const rate = parseFloat((e.target as HTMLInputElement).value);
         if (!isNaN(rate)) {
           this.audio.playbackRate = rate;
+          this.audio.defaultPlaybackRate = rate;
           if (this.playbackRateValue) {
             this.playbackRateValue.textContent = rate.toFixed(2) + "x";
           }
           this.updatePlaybackRateIcon(rate);
+          this.saveBackgroundSettings();
         }
       });
       const initialRate = parseFloat(this.playbackRateControl.value);
@@ -1742,6 +1753,7 @@ class WebLyricsPlayer {
           this.audio.volume = volume / 100;
           this.volumeValue.textContent = volume + "%";
           this.updateVolumeIcon(volume);
+          this.saveBackgroundSettings();
         }
       });
       this.volumeControl.addEventListener("wheel", (e) => {
@@ -1762,6 +1774,7 @@ class WebLyricsPlayer {
           this.audio.volume = newValue / 100;
           this.volumeValue.textContent = newValue + "%";
           this.updateVolumeIcon(newValue);
+          this.saveBackgroundSettings();
         }
       }, { passive: false });
     }
@@ -2674,7 +2687,6 @@ class WebLyricsPlayer {
 
     this.state.invertColors = checked;
     this.applyManualColors();
-    this.saveBackgroundSettings();
   }
 
   private applyDominantColorAsCSSVariable(): void {
@@ -2722,7 +2734,6 @@ class WebLyricsPlayer {
         this.state.backgroundType = 'fluid';
         this.updateBackground();
         this.updateBackgroundUI();
-        this.saveBackgroundSettings();
         break;
       case "cover":
         this.background.setAlbum(this.state.coverUrl || "./icons/icon-512x512.png");
@@ -2730,7 +2741,6 @@ class WebLyricsPlayer {
         this.state.backgroundType = 'cover';
         this.updateBackground();
         this.updateBackgroundUI();
-        this.saveBackgroundSettings();
         break;
       case "solid":
         this.background.setAlbum("");
@@ -2738,7 +2748,6 @@ class WebLyricsPlayer {
         this.state.backgroundType = 'solid';
         this.updateBackground();
         this.updateBackgroundUI();
-        this.saveBackgroundSettings();
         break;
       default:
         break;
@@ -2767,6 +2776,9 @@ class WebLyricsPlayer {
         this.invertColors(isChecked);
       }
     }
+    // Style changes can also change inversion/available cover effects.
+    // Persist their final values together, after those dependent controls update.
+    this.saveBackgroundSettings();
   }
 
   private setupAudioEvents() {
@@ -2918,13 +2930,11 @@ class WebLyricsPlayer {
       if (dragMode) dragMode.textContent = enabled ? '拖動跳播：開' : '拖動跳播：關';
       if (dragHint) dragHint.textContent = '單點播放／暫停 · 雙點跳播';
     };
-    let enabled = true;
-    try { enabled = localStorage.getItem('amll_speech_drag_seek_v1') !== 'false'; } catch { /* Session default works without storage. */ }
-    setDragMode(enabled);
+    setDragMode(true); // Validated persisted preference is applied once in start().
     dragMode?.addEventListener('click', () => {
       const next = !this.lyricPlayer.isDragSeekEnabled;
       setDragMode(next);
-      try { localStorage.setItem('amll_speech_drag_seek_v1', String(next)); } catch { /* Keep the in-session preference. */ }
+      this.saveBackgroundSettings();
     });
     const follow = document.createElement('button');
     follow.id = 'followPlayback'; follow.type = 'button';
@@ -3387,6 +3397,7 @@ class WebLyricsPlayer {
           this.playbackRateControl.value = speed.toString();
           if (this.audio) {
             this.audio.playbackRate = speed;
+            this.audio.defaultPlaybackRate = speed;
           }
           if (this.playbackRateValue) {
             this.playbackRateValue.textContent = speed.toFixed(2) + "x";
@@ -3900,6 +3911,7 @@ class WebLyricsPlayer {
       this.showTranslatedLyricCheckbox.addEventListener('change', (e) => {
         this.state.showTranslatedLyric = (e.target as HTMLInputElement).checked;
         this.updateLyricsDisplay();
+        this.saveBackgroundSettings();
       });
     }
 
@@ -3908,6 +3920,7 @@ class WebLyricsPlayer {
       this.showRomanLyricCheckbox.addEventListener('change', (e) => {
         this.state.showRomanLyric = (e.target as HTMLInputElement).checked;
         this.updateLyricsDisplay();
+        this.saveBackgroundSettings();
       });
     }
 
@@ -3916,6 +3929,7 @@ class WebLyricsPlayer {
       this.swapLyricPositionsCheckbox.addEventListener('change', (e) => {
         this.state.swapLyricPositions = (e.target as HTMLInputElement).checked;
         this.updateLyricsDisplay();
+        this.saveBackgroundSettings();
       });
     }
 
@@ -4422,6 +4436,7 @@ class WebLyricsPlayer {
   }
 
   private resetPlayer() {
+    this.preferencesReady = false;
     this.cancelLocalRestore();
     this.currentCaptions = null;
     void this.localMemory.clear();
@@ -4744,8 +4759,10 @@ class WebLyricsPlayer {
       rangeEndTime: 0,
     };
 
-    // 清除localStorage中的BackgroundSettings
-    localStorage.removeItem('amll_speech_background_settings_v1');
+    // Reset preferences independently of the existing local-media clear above.
+    this.loadBackgroundSettings(PREFERENCE_DEFAULTS);
+    this.preferencesReady = true;
+    this.saveBackgroundSettings();
 
     this.updateBackgroundUI();
     this.updateBackground();
@@ -5338,6 +5355,7 @@ class WebLyricsPlayer {
           this.playbackRateControl.value = speed.toString();
           if (this.audio) {
             this.audio.playbackRate = speed;
+            this.audio.defaultPlaybackRate = speed;
           }
           if (this.playbackRateValue) {
             this.playbackRateValue.textContent = speed.toFixed(2) + "x";
@@ -5415,8 +5433,8 @@ class WebLyricsPlayer {
   }
 
   public start() {
-    this.loadFromURLParams();
     this.loadBackgroundSettings();
+    this.loadFromURLParams(); // Explicit URL options take precedence for this visit.
     this.startAnimationLoop();
     this.background.resume();
 
@@ -5434,6 +5452,7 @@ class WebLyricsPlayer {
 
     this.isInitialized = true;
     this.initAlbumCoverEffects();
+    this.preferencesReady = true;
     this.setupLocalSession();
   }
 
@@ -5716,183 +5735,107 @@ class WebLyricsPlayer {
       (B > 255 ? 255 : B < 0 ? 0 : B)).toString(16).slice(1);
   }
 
-  private saveBackgroundSettings() {
-    const settings = {
-      backgroundType: this.state.backgroundType,
-      backgroundDynamic: this.state.backgroundDynamic,
-      backgroundFlowSpeed: this.state.backgroundFlowSpeed,
-      backgroundColorMask: this.state.backgroundColorMask,
-      backgroundMaskColor: this.state.backgroundMaskColor,
-      backgroundMaskOpacity: this.state.backgroundMaskOpacity,
-      showFPS: this.state.showFPS,
-      coverBlurLevel: this.state.coverBlurLevel,
-      invertColors: this.state.invertColors,
-      manualDominantColor: this.state.manualDominantColor,
-      manualDominantColorLight: this.state.manualDominantColorLight,
-      manualDominantColorDark: this.state.manualDominantColorDark,
-      marqueeEnabled: this.state.marqueeEnabled,
-      roundedCover: this.state.roundedCover,
-      coverRotationSpeed: this.state.coverRotationSpeed,
-      backgroundRenderScale: this.state.backgroundRenderScale,
-      lyricAlignPosition: this.state.lyricAlignPosition,
-      hidePassedLyrics: this.state.hidePassedLyrics,
-      enableLyricBlur: this.state.enableLyricBlur,
-      enableLyricScale: this.state.enableLyricScale,
-      enableLyricSpring: this.state.enableLyricSpring,
-      wordFadeWidth: this.state.wordFadeWidth,
-      lyricAlignAnchor: this.state.lyricAlignAnchor,
-      showTranslatedLyric: this.state.showTranslatedLyric,
-      showRomanLyric: this.state.showRomanLyric,
-      swapLyricPositions: this.state.swapLyricPositions,
-      showbgLyric: this.state.showbgLyric,
-      swapDuetsPositions: this.state.swapDuetsPositions,
-      advanceLyricTiming: this.state.advanceLyricTiming,
-      singleLyrics: this.state.singleLyrics,
-      backgroundLowFreqVolume: this.state.backgroundLowFreqVolume,
-      coverStyle: this.state.coverStyle,
-      fftDataRangeMin: this.state.fftDataRangeMin,
-      fftDataRangeMax: this.state.fftDataRangeMax,
-      posYSpringMass: this.state.posYSpringMass,
-      backgroundFPS: this.state.backgroundFPS,
-      posYSpringDamping: this.state.posYSpringDamping,
-      posYSpringStiffness: this.state.posYSpringStiffness,
-      posYSpringSoft: this.state.posYSpringSoft,
-      scaleSpringMass: this.state.scaleSpringMass,
-      scaleSpringDamping: this.state.scaleSpringDamping,
-      scaleSpringStiffness: this.state.scaleSpringStiffness,
-      scaleSpringSoft: this.state.scaleSpringSoft,
-      controlPointCode: this.controlPointCodeInput?.value || '',
-    };
-    localStorage.setItem('amll_speech_background_settings_v1', JSON.stringify(settings));
+  private renderPreferenceStatus(status: PreferenceStatus) {
+    const detail = document.getElementById('preferencesSaveStatus');
+    if (detail) detail.textContent = status.message;
+    const panel = document.getElementById('localSavePanel');
+    if (panel) panel.dataset.preferencesPhase = status.phase;
   }
 
-  private loadBackgroundSettings() {
+  private saveBackgroundSettings() {
+    if (!this.preferencesReady) return;
+    // Only the allowlist is serialized: never URLs, files, playback state or A–B ranges.
+    const settings = Object.fromEntries(Object.keys(PREFERENCE_DEFAULTS)
+      .filter(key => key in this.state).map(key => [key, this.state[key as keyof PlayerState]]));
+    this.preferenceMemory.save({
+      ...settings, playbackRate: this.audio.playbackRate, volume: this.audio.volume,
+      dragSeekEnabled: this.lyricPlayer.isDragSeekEnabled, controlPointCode: this.appliedControlPointCode,
+    } as Preferences);
+  }
+
+  private loadBackgroundSettings(override?: Partial<Preferences>) {
+    const ready = this.preferencesReady;
+    this.preferencesReady = false;
     try {
-      const saved = localStorage.getItem('amll_speech_background_settings_v1');
-      if (saved) {
-        const settings = JSON.parse(saved);
-        this.state.backgroundType = settings.backgroundType || 'fluid';
-        this.state.backgroundDynamic = settings.backgroundDynamic !== undefined ? settings.backgroundDynamic : true;
-        this.state.backgroundFlowSpeed = settings.backgroundFlowSpeed || 4;
-        this.state.backgroundColorMask = settings.backgroundColorMask !== undefined ? settings.backgroundColorMask : true;
-        this.state.backgroundMaskColor = settings.backgroundMaskColor || '#FFFFFF';
-        this.state.backgroundMaskOpacity = settings.backgroundMaskOpacity !== undefined ? settings.backgroundMaskOpacity : 70;
-        this.state.showFPS = settings.showFPS !== undefined ? settings.showFPS : false;
-        this.state.coverBlurLevel = settings.coverBlurLevel !== undefined ? settings.coverBlurLevel : 100;
-        this.state.invertColors = settings.invertColors !== undefined ? settings.invertColors : false;
-        this.state.originalInvertColors = this.state.invertColors;
-        this.state.manualDominantColor = settings.manualDominantColor;
-        this.state.manualDominantColorLight = settings.manualDominantColorLight;
-        this.state.manualDominantColorDark = settings.manualDominantColorDark;
-        this.state.roundedCover = settings.roundedCover !== undefined ? settings.roundedCover : 55;
-        this.state.marqueeEnabled = settings.marqueeEnabled !== undefined ? settings.marqueeEnabled : true;
-        this.state.coverRotationSpeed = settings.coverRotationSpeed !== undefined ? settings.coverRotationSpeed : 0;
-        this.state.backgroundRenderScale = settings.backgroundRenderScale !== undefined ? settings.backgroundRenderScale : 1;
-        this.state.lyricAlignPosition = settings.lyricAlignPosition !== undefined ? settings.lyricAlignPosition : 0.4;
-        this.state.hidePassedLyrics = settings.hidePassedLyrics !== undefined ? settings.hidePassedLyrics : false;
-        this.state.enableLyricBlur = settings.enableLyricBlur !== undefined ? settings.enableLyricBlur : true;
-        this.state.enableLyricScale = settings.enableLyricScale !== undefined ? settings.enableLyricScale : true;
-        this.state.enableLyricSpring = settings.enableLyricSpring !== undefined ? settings.enableLyricSpring : true;
-        this.state.wordFadeWidth = settings.wordFadeWidth !== undefined ? settings.wordFadeWidth : 0.50;
-        this.state.lyricAlignAnchor = settings.lyricAlignAnchor || 'center';
-        this.state.showTranslatedLyric = settings.showTranslatedLyric !== undefined ? settings.showTranslatedLyric : true;
-        this.state.showRomanLyric = settings.showRomanLyric !== undefined ? settings.showRomanLyric : true;
-        this.state.swapLyricPositions = settings.swapLyricPositions !== undefined ? settings.swapLyricPositions : false;
-        this.state.showbgLyric = settings.showbgLyric !== undefined ? settings.showbgLyric : true;
-        this.state.swapDuetsPositions = settings.swapDuetsPositions !== undefined ? settings.swapDuetsPositions : false;
-        this.state.advanceLyricTiming = settings.advanceLyricTiming !== undefined ? settings.advanceLyricTiming : false;
-        this.state.singleLyrics = settings.singleLyrics !== undefined ? settings.singleLyrics : false;
-        this.state.backgroundLowFreqVolume = settings.backgroundLowFreqVolume !== undefined ? settings.backgroundLowFreqVolume : 1;
-        this.state.coverStyle = settings.coverStyle || 'normal';
-        this.state.fftDataRangeMin = settings.fftDataRangeMin || 1;
-        this.state.fftDataRangeMax = settings.fftDataRangeMax || 22050;
-        this.state.posYSpringMass = settings.posYSpringMass !== undefined ? settings.posYSpringMass : 1;
-        this.state.backgroundFPS = settings.backgroundFPS !== undefined ? settings.backgroundFPS : 30;
-        this.state.posYSpringDamping = settings.posYSpringDamping !== undefined ? settings.posYSpringDamping : 15;
-        this.state.posYSpringStiffness = settings.posYSpringStiffness !== undefined ? settings.posYSpringStiffness : 100;
-        this.state.posYSpringSoft = settings.posYSpringSoft !== undefined ? settings.posYSpringSoft : false;
-        this.state.scaleSpringMass = settings.scaleSpringMass !== undefined ? settings.scaleSpringMass : 1;
-        this.state.scaleSpringDamping = settings.scaleSpringDamping !== undefined ? settings.scaleSpringDamping : 20;
-        this.state.scaleSpringStiffness = settings.scaleSpringStiffness !== undefined ? settings.scaleSpringStiffness : 100;
-        this.state.scaleSpringSoft = settings.scaleSpringSoft !== undefined ? settings.scaleSpringSoft : false;
+      const saved = override ?? this.preferenceMemory.read();
+      const settings: Preferences = { ...PREFERENCE_DEFAULTS,
+        // Reduced motion supplies the initial default; an explicit saved choice wins.
+        backgroundDynamic: this.state.backgroundDynamic, enableLyricSpring: this.state.enableLyricSpring, ...saved };
+      const { playbackRate, volume, dragSeekEnabled, controlPointCode, ...stateSettings } = settings;
+      Object.assign(this.state, stateSettings);
+      this.state.originalInvertColors = settings.invertColors;
+      this.audio.defaultPlaybackRate = playbackRate;
+      this.audio.playbackRate = playbackRate;
+      this.audio.volume = volume;
+      this.lyricPlayer.setDragSeekEnabled(dragSeekEnabled);
+      const dragMode = document.getElementById('dragSeekMode');
+      dragMode?.setAttribute('aria-pressed', String(dragSeekEnabled));
+      if (dragMode) dragMode.textContent = dragSeekEnabled ? '拖動跳播：開' : '拖動跳播：關';
 
-        if (settings.controlPointCode && this.controlPointCodeInput) {
-          this.controlPointCodeInput.value = settings.controlPointCode;
-        }
-
-        this.updateBackgroundUI();
-        this.updateBackground();
-        this.updateFPSDisplay();
-        this.updateRoundedCover();
-        this.updateCoverStyle();
-        this.updateLyricsDisplay();
-        this.updateMarqueeSettings();
-        this.lyricPlayer.setAlignPosition(this.state.lyricAlignPosition);
-        this.invertColors(this.state.invertColors);
-        this.lyricPlayer.setEnableBlur(this.state.enableLyricBlur);
-        this.lyricPlayer.setEnableScale(this.state.enableLyricScale);
-        this.lyricPlayer.setEnableSpring(this.state.enableLyricSpring);
-        this.lyricPlayer.setWordFadeWidth(this.state.wordFadeWidth);
-        this.lyricPlayer.setLinePosYSpringParams({ mass: this.state.posYSpringMass, damping: this.state.posYSpringDamping, stiffness: this.state.posYSpringStiffness, soft: this.state.posYSpringSoft });
-        this.lyricPlayer.setLineScaleSpringParams({ mass: this.state.scaleSpringMass, damping: this.state.scaleSpringDamping, stiffness: this.state.scaleSpringStiffness, soft: this.state.scaleSpringSoft });
-        this.background.setRenderScale(this.state.backgroundRenderScale);
-
-        if (settings.controlPointCode) {
-          this.applyControlPointCode();
-        }
+      const controlIds: Partial<Record<keyof Preferences, string>> = {
+        playbackRate: 'playbackRate', loopPlay: 'loopPlay', backgroundType: 'backgroundStyle',
+        backgroundFlowSpeed: 'bgFlowSpeed', backgroundColorMask: 'bgColorMask', backgroundMaskColor: 'bgMaskColor',
+        backgroundMaskOpacity: 'bgMaskOpacity', showFPS: 'showFPS', invertColors: 'invertColors',
+        coverBlurLevel: 'coverBlurLevel', marqueeEnabled: 'enableMarquee', roundedCover: 'roundedCover',
+        coverRotationSpeed: 'coverRotation', backgroundRenderScale: 'bgRenderScale', backgroundFPS: 'bgFPS',
+        lyricAlignPosition: 'lyricAlignPosition', hidePassedLyrics: 'hidePassedLyrics',
+        enableLyricBlur: 'enableLyricBlur', enableLyricScale: 'enableLyricScale', enableLyricSpring: 'enableLyricSpring',
+        wordFadeWidth: 'wordFadeWidth', lyricAlignAnchor: 'lyricAlignAnchor', showTranslatedLyric: 'showTranslatedLyric',
+        showRomanLyric: 'showRomanLyric', swapLyricPositions: 'swapLyricPositions', showbgLyric: 'showbgLyric',
+        swapDuetsPositions: 'swapDuetsPositions', advanceLyricTiming: 'advanceLyricTiming', singleLyrics: 'singleLyrics',
+        backgroundLowFreqVolume: 'bgLowFreqVolume', coverStyle: 'coverStyle', fftDataRangeMin: 'fftDataRangeMin',
+        fftDataRangeMax: 'fftDataRangeMax', posYSpringMass: 'springPosYMass', posYSpringDamping: 'springPosYDamping',
+        posYSpringStiffness: 'springPosYStiffness', posYSpringSoft: 'springPosYSoft',
+        scaleSpringMass: 'springScaleMass', scaleSpringDamping: 'springScaleDamping',
+        scaleSpringStiffness: 'springScaleStiffness', scaleSpringSoft: 'springScaleSoft',
+      };
+      for (const [key, id] of Object.entries(controlIds)) {
+        const input = document.getElementById(id) as HTMLInputElement | HTMLSelectElement | null;
+        if (!input) continue;
+        const value = settings[key as keyof Preferences];
+        if (input instanceof HTMLInputElement && input.type === 'checkbox') input.checked = Boolean(value);
+        else input.value = String(value);
       }
-
-      if (this.lyricAlignPositionValue) {
-        this.lyricAlignPositionValue.textContent = this.state.lyricAlignPosition.toFixed(1);
+      if (this.volumeControl) this.volumeControl.value = String(volume * 100);
+      if (this.volumeValue) this.volumeValue.textContent = Math.round(volume * 100) + '%';
+      if (this.playbackRateValue) this.playbackRateValue.textContent = playbackRate.toFixed(2) + 'x';
+      this.updateVolumeIcon(volume * 100);
+      this.updatePlaybackRateIcon(playbackRate);
+      this.appliedControlPointCode = controlPointCode;
+      if (this.controlPointCodeInput) this.controlPointCodeInput.value = controlPointCode;
+      this.updateBackgroundUI();
+      this.updateRoundedCover();
+      this.updateCoverStyle();
+      this.updateCoverRotation();
+      this.updateBackground();
+      this.background.setLowFreqVolume(this.state.backgroundLowFreqVolume);
+      this.updateFFTDataRange();
+      this.updateFPSDisplay();
+      this.applyManualColors();
+      this.lyricPlayer.setAlignPosition(this.state.lyricAlignPosition);
+      this.lyricPlayer.setAlignAnchor(this.state.lyricAlignAnchor);
+      this.lyricPlayer.setEnableBlur(this.state.enableLyricBlur);
+      this.lyricPlayer.setEnableScale(this.state.enableLyricScale);
+      this.lyricPlayer.setEnableSpring(this.state.enableLyricSpring);
+      this.lyricPlayer.setWordFadeWidth(this.state.wordFadeWidth);
+      this.lyricPlayer.setLinePosYSpringParams({ mass: this.state.posYSpringMass, damping: this.state.posYSpringDamping, stiffness: this.state.posYSpringStiffness, soft: this.state.posYSpringSoft });
+      this.lyricPlayer.setLineScaleSpringParams({ mass: this.state.scaleSpringMass, damping: this.state.scaleSpringDamping, stiffness: this.state.scaleSpringStiffness, soft: this.state.scaleSpringSoft });
+      for (const id of ['springPosYMass', 'springPosYDamping', 'springPosYStiffness', 'springScaleMass', 'springScaleDamping', 'springScaleStiffness']) {
+        const input = document.getElementById(id) as HTMLInputElement | null;
+        const label = document.getElementById(id + 'Value');
+        if (input && label) label.textContent = input.value;
       }
-      if (this.springPosYMassValue) {
-        this.springPosYMassValue.textContent = this.state.posYSpringMass.toFixed(1);
-      }
-      if (this.springPosYDampingValue) {
-        this.springPosYDampingValue.textContent = this.state.posYSpringDamping.toString();
-      }
-      if (this.springPosYStiffnessValue) {
-        this.springPosYStiffnessValue.textContent = this.state.posYSpringStiffness.toString();
-      }
-      if (this.springScaleMassValue) {
-        this.springScaleMassValue.textContent = this.state.scaleSpringMass.toFixed(1);
-      }
-      if (this.springScaleDampingValue) {
-        this.springScaleDampingValue.textContent = this.state.scaleSpringDamping.toString();
-      }
-      if (this.springScaleStiffnessValue) {
-        this.springScaleStiffnessValue.textContent = this.state.scaleSpringStiffness.toString();
-      }
-      if (this.hidePassedLyricsCheckbox) {
-        this.hidePassedLyricsCheckbox.checked = this.state.hidePassedLyrics;
-      }
-      if (this.enableLyricBlur) {
-        this.enableLyricBlur.checked = this.state.enableLyricBlur;
-      }
-      if (this.enableLyricScale) {
-        this.enableLyricScale.checked = this.state.enableLyricScale;
-      }
-      if (this.enableLyricSpring) {
-        this.enableLyricSpring.checked = this.state.enableLyricSpring;
-        const springDesc = document.getElementById('spring-desc');
-        if (springDesc) {
-          springDesc.style.display = this.state.enableLyricSpring ? 'block' : 'none';
-        }
-      }
-      if (this.wordFadeWidthInput) {
-        this.wordFadeWidthInput.value = this.state.wordFadeWidth.toString();
-      }
-      if (this.wordFadeWidthValue) {
-        this.wordFadeWidthValue.textContent = this.state.wordFadeWidth.toFixed(2);
-      }
-      if (this.showbgLyricCheckbox) {
-        this.showbgLyricCheckbox.checked = this.state.showbgLyric;
-      }
-      if (this.swapDuetsPositionsCheckbox) {
-        this.swapDuetsPositionsCheckbox.checked = this.state.swapDuetsPositions;
-      }
-    } catch (error) {
-      console.log('加载背景设置失败:', error);
+      if (this.wordFadeWidthValue) this.wordFadeWidthValue.textContent = this.state.wordFadeWidth.toFixed(2);
+      const springDesc = document.getElementById('spring-desc');
+      if (springDesc) springDesc.style.display = this.state.enableLyricSpring ? 'block' : 'none';
+      this.updateLayoutByOrientation();
+      this.updateMarqueeSettings();
+      this.updateTimeDisplay();
+      if (controlPointCode) void this.applyControlPointCode();
+    } catch {
+      this.renderPreferenceStatus({ phase: 'error', message: '部分設定未能套用；本次仍可調整。' });
+    } finally {
+      this.preferencesReady = ready;
     }
   }
 
@@ -6009,12 +5952,18 @@ class WebLyricsPlayer {
   }
 
   // 更新背景显示
-  private applyControlPointCode() {
+  private async applyControlPointCode() {
     if (!this.controlPointCodeInput || !this.background) {
       return;
     }
 
-    const code = this.controlPointCodeInput.value.trim();
+    const code = validControlPointCode(this.controlPointCodeInput.value);
+    if (code === null) {
+      this.showStatus('Background control points must be valid, bounded JSON.', true);
+      return;
+    }
+    this.appliedControlPointCode = code;
+    this.saveBackgroundSettings();
     if (!code) {
       try {
         const renderer = this.background['renderer'];
@@ -6089,7 +6038,8 @@ class WebLyricsPlayer {
       renderer['manualControl'] = true;
 
       if (!renderer['meshStates'] || renderer['meshStates'].length === 0) {
-        renderer.setAlbum(this.state.coverUrl || "./icons/icon-512x512.png");
+        await renderer.setAlbum(this.state.coverUrl || "./icons/icon-512x512.png");
+        if (this.appliedControlPointCode !== code) return;
 
         if (!renderer['meshStates'] || renderer['meshStates'].length === 0) {
           return;

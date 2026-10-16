@@ -187,6 +187,10 @@ async def main():
   reset=await tablet.evaluate("(()=>{const c=player.getBackground().getElement();return {w:c.width,cssW:c.clientWidth}})()")
   assert reset['w']==reset['cssW']*2,reset
   results['reset_scale']=True
+  # Full Reset now restores all preferences, including the default seek mode.
+  # The following cases specifically exercise manual browsing and A–B wrapping.
+  assert await tablet.locator('#dragSeekMode').get_attribute('aria-pressed')=='true'
+  await tablet.locator('#dragSeekMode').tap()
   await tablet.locator('#musicFile').set_input_files(str(OUT/'synthetic.wav'))
   await tablet.wait_for_function('player.getAudio().duration===60')
   await tablet.evaluate('player.getAudio().pause();player.state.isRangeMode=true;player.state.rangeStartTime=0;player.state.rangeEndTime=1;player.seekAudio(.8)')
