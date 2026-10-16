@@ -48,7 +48,7 @@
       text-decoration-thickness: 2px;
       text-underline-offset: 4px;
     }
-    #localSavePanel[data-phase="error"] summary, #localSavePanel[data-preferences-phase="error"] summary { border-color: currentColor; }
+    #localSavePanel[data-phase="error"] summary, #localSavePanel[data-preferences-phase="error"] summary, #localSavePanel[data-background-phase="error"] summary { border-color: currentColor; }
     #practiceToolbar button:focus-visible, #localSavePanel summary:focus-visible, #localSavePanel button:focus-visible {
       outline: 2px solid currentColor;
       outline-offset: 3px;
@@ -1265,10 +1265,13 @@
     <summary title="本機保存選項"><span id="localSaveSummary" aria-live="polite">本機 · 讀取中…</span></summary>
     <div class="save-details">
       <p id="localSaveStatus" role="status" aria-live="polite">正在讀取上次的本機保存…</p>
-      <p id="preferencesSaveStatus" class="save-note" role="status" aria-live="polite">設定更改後會自動保存於此瀏覽器。</p>
-      <p class="save-note">音訊與字幕只保存在此瀏覽器，不會上傳。空間不足、清除網站資料或久未使用時，瀏覽器可能移除保存，請保留原檔。</p>
       <button id="saveLocalSession" type="button">保存目前檔案／重試</button>
-      <button id="clearLocalSession" type="button">清除保存檔案</button>
+      <button id="clearLocalSession" type="button">清除全部保存檔案</button>
+      <p id="backgroundSaveStatus" class="save-note" role="status" aria-live="polite">選入本機背景／封面圖片後會自動保存（上限 20 MiB）。</p>
+      <button id="saveLocalBackground" type="button" disabled>保存背景／重試</button>
+      <button id="clearLocalBackground" type="button">清除背景圖片</button>
+      <p id="preferencesSaveStatus" class="save-note" role="status" aria-live="polite">設定更改後會自動保存於此瀏覽器。</p>
+      <p class="save-note">音訊、字幕與本機圖片只保存在此瀏覽器，不會上傳。空間不足、清除網站資料或久未使用時，瀏覽器可能移除保存，請保留原檔。</p>
     </div>
   </details>
   <div id="player">

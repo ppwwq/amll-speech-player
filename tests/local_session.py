@@ -232,13 +232,13 @@ async def main():
         record('late_restore_read_cannot_override_manual_import')
 
         # Clear failure is visible and leaves the actual record intact.
-        await page.evaluate('''()=>{window.originalClear=IDBObjectStore.prototype.clear;
-          IDBObjectStore.prototype.clear=function(){throw new DOMException('Synthetic unavailable','SecurityError')}}''')
+        await page.evaluate('''()=>{window.originalDelete=IDBObjectStore.prototype.delete;
+          IDBObjectStore.prototype.delete=function(key){if(key==='last')throw new DOMException('Synthetic unavailable','SecurityError');return originalDelete.call(this,key)}}''')
         prior = await stored(page)
         await panel_action(page, '#clearLocalSession'); await phase(page, 'error')
         assert '未能清除' in await page.locator('#localSaveStatus').text_content()
         assert await stored(page) == prior
-        await page.evaluate('()=>{IDBObjectStore.prototype.clear=originalClear}')
+        await page.evaluate('()=>{IDBObjectStore.prototype.delete=originalDelete}')
         await panel_action(page, '#clearLocalSession'); await phase(page, 'cleared')
         assert await stored(page) is None
         record('clear_failure_is_not_reported_as_cleared')

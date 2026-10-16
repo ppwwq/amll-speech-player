@@ -1,0 +1,13 @@
+# Browsing stays in place; seeking resumes following
+
+Ordinary mouse-wheel browsing and vertical browsing with drag-to-seek turned off retain their position after the gesture/inertia settles. Idle time does not return the transcript to the playing sentence. **Follow**, a double-tapped or keyboard-activated sentence, a valid released drag selection, and other explicit seek controls restore following at the configured lyric alignment. Seeking preserves play/pause, and selecting the current sentence still replays its start once.
+
+This corrects the withdrawn interpretation in `8dc417f`. Its `holdPosition` state and layout compensation have been removed. The explicit-seek function and settings preference implementation match `ab035e3`; the lyric adapter change relative to that revision only removes the five-second `followTimer`, its scheduling method and calls. The existing manual anchor, inertia, AMLL renderer, selection preview, time badge, sorting, single-tap actions and Follow reset remain. The upstream AMLL input handlers are already disabled with `allowScroll=false`, so they do not arm a competing idle timer. The separate [background-image storage addition](LOCAL_BACKGROUND.md) does not change this seek behavior.
+
+Automatic A–B wrapping and track repeat retain their existing `follow=false` behavior; they are not user-requested seeks. Loading/replacing captions and resetting the player still initialize their layout. Browsing position is temporary view state, not a persisted preference.
+
+`tests/browse_position.py` uses actual mouse/touch input and real 6.2-second idle waits on desktop, tablet and phone viewports. It checks wheel and inertial browsing during playback and pause, stable DOM/cached geometry across lyric boundaries, Follow and keyboard seek alignment, top/middle/bottom double taps including wrapped sentences, both drag-seek directions, and cancelled selection. Existing settings, media, single/double-tap, same-line replay and mobile UI suites provide regression coverage.
+
+All 45 dedicated behavior cases passed with no page errors; see [results](results/browse-position-results.json). Geometry checks allow under 2px of DOM rounding/scale variation and under 0.1px of cached layout movement while browsing. Follow checks wait for the existing spring to reach alignment rather than assuming a fixed animation duration.
+
+Browser validation uses synthetic media on a local production build in Chromium. Touch and viewport emulation do not constitute physical iPad Safari testing. Production deployment is verified through GitHub/Vercel status and the original domain; production-site browser access is not claimed.

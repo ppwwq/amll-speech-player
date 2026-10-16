@@ -8,6 +8,8 @@ After a successful local import, the app saves the audio Blob, caption text, fil
 
 The **本機** menu displays pending, completed, cleared or failed storage states. Save/Retry explicitly retries the current files. Clear removes the saved files and position without unloading current playback; time updates cannot immediately re-create the deleted record. A new file selection or explicit Save starts saving again. Player Reset also clears persistence.
 
+Custom local background/cover images now have a separate `media['background']` record in the same database. Media replacement/progress writes do not rewrite that image, and image-only clear does not remove the audio/caption pair. The menu's Clear All and Reset coordinate clearing both. See [image storage and failure behavior](LOCAL_BACKGROUND.md).
+
 Audio and captions remain in browser storage on the current origin. The persistence module contains no fetch, upload or analytics code. Tests use only synthetic media and check that no non-read network requests occur. A fresh browser profile, another browser, a different website domain, or another device has separate storage.
 
 Explicit remote audio URLs and direct/URL caption inputs detach progress tracking from the saved local-file pair. They retain their upstream behavior and do not silently pair remote content with previously saved local files.

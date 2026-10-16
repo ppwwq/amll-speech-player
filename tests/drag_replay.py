@@ -110,7 +110,7 @@ async def main():
       st=await state(page)
       assert (await counts(page))=={'commits':[8000],'seeks':1},(name,playing,st)
       assert st['paused']==(not playing) and 8<=st['time']<8.8,(name,playing,st)
-      assert st['hot']==[1] and not st['following'],st
+      assert st['hot']==[1] and st['following'],st
       if not playing:assert st['lyric']==8000,st
       await page.wait_for_timeout(400)
       assert (await counts(page))=={'commits':[8000],'seeks':1}

@@ -22,7 +22,7 @@ async def observe(page):
 
 
 async def reset(page, playing=False):
- await page.evaluate('player.getAudio().pause();player.getLyricPlayer().resetScroll();player.seekAudio(0)')
+ await page.evaluate('player.getAudio().pause();player.seekAudio(0)')
  await page.wait_for_timeout(500)
  if playing:
   await page.locator('#playPauseBtn').click()

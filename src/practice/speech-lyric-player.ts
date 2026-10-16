@@ -4,7 +4,7 @@ import { TapGesture, DoubleTapGesture, DOUBLE_TAP_WINDOW_MS, dragSeekTime, dragS
 type Line = DomLyricPlayer['currentLyricLineObjects'][number];
 // Runtime fields of pinned alpha.5, omitted from its declarations by @internal.
 type LineSprings = { lineTransforms: {
-  posY: { setTargetPosition(position: number): void; setPosition(position: number): void; getCurrentPosition(): number };
+  posY: { setTargetPosition(position: number): void; setPosition(position: number): void };
   scale: { setTargetPosition(position: number): void };
 } };
 type LineLayout = [top: number, scale: number, opacity: number, blur: number];
@@ -20,11 +20,7 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
   declare readonly lyricLinesSize: WeakMap<Line, [number, number]>;
   declare readonly lyricLineElementMap: WeakMap<Element, Line>;
   private manual = false;
-  private positionHeld = false;
   private manualAnchor = 0;
-  private layoutAnchor = 0;
-  private heldLayout: { line: Line; top: number } | null = null;
-  private followTimer = 0;
   private inertia = 0;
   private layoutFrame = 0;
   private syncLayout = false;
@@ -92,26 +88,7 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
   }
 
   get isFollowing() { return !this.manual; }
-  get isPositionHeld() { return this.positionHeld; }
   get isDragSeekEnabled() { return this.dragSeekEnabled; }
-
-  /** A committed sentence choice stays where it was until explicit Follow. */
-  holdPosition(startTime: number) {
-    cancelAnimationFrame(this.inertia);
-    const wasManual = this.manual;
-    // Freeze the displayed layout, even if playback has queued a newer anchor
-    // or a position spring is still moving when the second tap arrives.
-    const visibleLines = [...this.animated].filter(line => {
-      const top = (line as Line & LineSprings).lineTransforms.posY.getCurrentPosition();
-      return top < this.size[1] && top + (this.lyricLinesSize.get(line)?.[1] ?? 0) > 0;
-    });
-    const visible = visibleLines.find(line => line.getLine().startTime === startTime) ?? visibleLines[0];
-    this.heldLayout = visible ? { line: visible,
-      top: (visible as Line & LineSprings).lineTransforms.posY.getCurrentPosition() } : null;
-    this.beginManual();
-    if (!wasManual) this.manualAnchor = this.layoutAnchor;
-    this.positionHeld = true;
-  }
 
   setDragSeekEnabled(enabled: boolean) {
     this.cancelTap();
@@ -227,7 +204,6 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
     clearTimeout(this.singleTapTimer);
     this.singleTapTimer = 0;
     cancelAnimationFrame(this.inertia);
-    clearTimeout(this.followTimer);
     this.gesture.begin(e.clientX, e.clientY, e.timeStamp);
     // Geometry is read once at gesture start. A resize cancels rather than using stale bounds.
     const bounds = this.element.getBoundingClientRect();
@@ -297,7 +273,6 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
       this.cancelTap();
       if (p.dragging && !p.seek && e.timeStamp - p.time < 100) this.startInertia(p.velocity);
     }
-    this.scheduleFollow();
   };
 
   private onPointerCancel = (e: PointerEvent) => {
@@ -311,7 +286,6 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
     this.hideDragPreview();
     if (p && this.element.hasPointerCapture(p.id)) this.element.releasePointerCapture(p.id);
     cancelAnimationFrame(this.inertia);
-    this.scheduleFollow();
   }
 
   private onWheel = (e: WheelEvent) => {
@@ -321,12 +295,10 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
     cancelAnimationFrame(this.inertia);
     this.beginManual();
     this.scrollByPixels(e.deltaY * (e.deltaMode === 1 ? 24 : e.deltaMode === 2 ? this.size[1] : 1));
-    this.scheduleFollow();
   };
 
   private beginManual() {
     this.cancelTap();
-    clearTimeout(this.followTimer);
     if (this.manual) return;
     this.manual = true;
     this.manualAnchor = this.scrollToIndex;
@@ -350,14 +322,8 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
       this.scrollByPixels(velocity * dt);
       velocity *= Math.exp(-dt / 180); // Time-based friction, consistent on 60/120 Hz screens.
       if (Math.abs(velocity) > 0.02 && before !== this.scrollOffset) this.inertia = requestAnimationFrame(step);
-      else this.scheduleFollow();
     };
     this.inertia = requestAnimationFrame(step);
-  }
-
-  private scheduleFollow() {
-    clearTimeout(this.followTimer);
-    if (this.manual && !this.positionHeld) this.followTimer = window.setTimeout(() => this.resetScroll(), 5000);
   }
 
   override resetScroll() {
@@ -365,9 +331,6 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
     this.hideDragPreview();
     this.cancelTap();
     cancelAnimationFrame(this.inertia);
-    clearTimeout(this.followTimer);
-    this.positionHeld = false;
-    this.heldLayout = null;
     this.manual = false;
     this.element.classList.remove('manual-scroll');
     super.resetScroll();
@@ -405,18 +368,7 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
     this.layoutFrame = 0;
     const currentAnchor = this.scrollToIndex;
     if (this.manual) this.scrollToIndex = this.manualAnchor;
-    this.layoutAnchor = this.scrollToIndex;
     void super.calcLayout(this.syncLayout);
-    if (this.heldLayout) {
-      // Account for a queued spring or interlude spacer disappearing on seek.
-      // Both layouts complete before paint; retain the selected row's position.
-      const correction = (this.targetTop.get(this.heldLayout.line) ?? this.heldLayout.top) - this.heldLayout.top;
-      this.heldLayout = null;
-      if (Math.abs(correction) > 0.01) {
-        this.scrollOffset += correction;
-        void super.calcLayout(true);
-      }
-    }
     this.scrollToIndex = currentAnchor;
     this.syncLayout = false;
     this.snapLayout = false;
@@ -522,7 +474,6 @@ export class SpeechLyricPlayer extends DomLyricPlayer {
     this.events.abort();
     cancelAnimationFrame(this.layoutFrame);
     cancelAnimationFrame(this.inertia);
-    clearTimeout(this.followTimer);
     super.dispose();
   }
 }

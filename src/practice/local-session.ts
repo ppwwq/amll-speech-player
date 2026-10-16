@@ -1,4 +1,5 @@
 /** Local-only persistence. No file bytes or captions leave this origin. */
+import type { BackgroundBackend, SavedBackground } from './local-background';
 export const SESSION_DB = 'amll-local-session-v1';
 export const CHECKPOINT_KEY = 'amll-local-position-v1';
 export const PROGRESS_INTERVAL = 2000;
@@ -46,7 +47,7 @@ export function decodeSession(media: any, progress: any): SavedSession | null {
     : { id: media.id, position: 0, delay: 0, updatedAt: 0 } };
 }
 
-export class IndexedDBSessionStore implements SessionBackend {
+export class IndexedDBSessionStore implements SessionBackend, BackgroundBackend {
   private database: Promise<IDBDatabase> | null = null;
 
   private open(): Promise<IDBDatabase> {
@@ -137,10 +138,21 @@ export class IndexedDBSessionStore implements SessionBackend {
   }
   clear(): Promise<void> {
     return this.transaction('readwrite', (tx, result) => {
-      tx.objectStore('media').clear();
-      tx.objectStore('progress').clear();
+      tx.objectStore('media').delete('last');
+      tx.objectStore('progress').delete('last');
       result(undefined);
     });
+  }
+  readBackground(): Promise<unknown> {
+    return this.transaction('readonly', (tx, result) => {
+      tx.objectStore('media').get('background').onsuccess = e => result((e.target as IDBRequest).result);
+    });
+  }
+  writeBackground(image: SavedBackground): Promise<void> {
+    return this.transaction('readwrite', (tx, result) => { tx.objectStore('media').put(image, 'background'); result(undefined); });
+  }
+  clearBackground(): Promise<void> {
+    return this.transaction('readwrite', (tx, result) => { tx.objectStore('media').delete('background'); result(undefined); });
   }
 }
 

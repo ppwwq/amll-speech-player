@@ -1,0 +1,99 @@
+{
+  "cases": {
+    "desktop_wheel_playing_False": {
+      "idle_wait_ms": 6200,
+      "no_seek_during_browse": true,
+      "follow_button_and_keyboard_seek_realign": true
+    },
+    "desktop_drag_playing_False": {
+      "idle_wait_ms": 6200,
+      "no_seek_during_browse": true,
+      "follow_button_and_keyboard_seek_realign": true
+    },
+    "desktop_double_top_playing_False": true,
+    "desktop_double_middle_playing_False": true,
+    "desktop_double_bottom_playing_False": true,
+    "desktop_drag_seek_-80_playing_False": true,
+    "desktop_drag_seek_80_playing_False": true,
+    "desktop_wheel_playing_True": {
+      "idle_wait_ms": 6200,
+      "no_seek_during_browse": true,
+      "follow_button_and_keyboard_seek_realign": true
+    },
+    "desktop_drag_playing_True": {
+      "idle_wait_ms": 6200,
+      "no_seek_during_browse": true,
+      "follow_button_and_keyboard_seek_realign": true
+    },
+    "desktop_double_top_playing_True": true,
+    "desktop_double_middle_playing_True": true,
+    "desktop_double_bottom_playing_True": true,
+    "desktop_drag_seek_-80_playing_True": true,
+    "desktop_drag_seek_80_playing_True": true,
+    "desktop_cancelled_selection_stays_browsing": true,
+    "tablet_wheel_playing_False": {
+      "idle_wait_ms": 6200,
+      "no_seek_during_browse": true,
+      "follow_button_and_keyboard_seek_realign": true
+    },
+    "tablet_drag_playing_False": {
+      "idle_wait_ms": 6200,
+      "no_seek_during_browse": true,
+      "follow_button_and_keyboard_seek_realign": true
+    },
+    "tablet_double_top_playing_False": true,
+    "tablet_double_middle_playing_False": true,
+    "tablet_double_bottom_playing_False": true,
+    "tablet_drag_seek_-80_playing_False": true,
+    "tablet_drag_seek_80_playing_False": true,
+    "tablet_wheel_playing_True": {
+      "idle_wait_ms": 6200,
+      "no_seek_during_browse": true,
+      "follow_button_and_keyboard_seek_realign": true
+    },
+    "tablet_drag_playing_True": {
+      "idle_wait_ms": 6200,
+      "no_seek_during_browse": true,
+      "follow_button_and_keyboard_seek_realign": true
+    },
+    "tablet_double_top_playing_True": true,
+    "tablet_double_middle_playing_True": true,
+    "tablet_double_bottom_playing_True": true,
+    "tablet_drag_seek_-80_playing_True": true,
+    "tablet_drag_seek_80_playing_True": true,
+    "tablet_cancelled_selection_stays_browsing": true,
+    "phone_wheel_playing_False": {
+      "idle_wait_ms": 6200,
+      "no_seek_during_browse": true,
+      "follow_button_and_keyboard_seek_realign": true
+    },
+    "phone_drag_playing_False": {
+      "idle_wait_ms": 6200,
+      "no_seek_during_browse": true,
+      "follow_button_and_keyboard_seek_realign": true
+    },
+    "phone_double_top_playing_False": true,
+    "phone_double_middle_playing_False": true,
+    "phone_double_bottom_playing_False": true,
+    "phone_drag_seek_-80_playing_False": true,
+    "phone_drag_seek_80_playing_False": true,
+    "phone_wheel_playing_True": {
+      "idle_wait_ms": 6200,
+      "no_seek_during_browse": true,
+      "follow_button_and_keyboard_seek_realign": true
+    },
+    "phone_drag_playing_True": {
+      "idle_wait_ms": 6200,
+      "no_seek_during_browse": true,
+      "follow_button_and_keyboard_seek_realign": true
+    },
+    "phone_double_top_playing_True": true,
+    "phone_double_middle_playing_True": true,
+    "phone_double_bottom_playing_True": true,
+    "phone_drag_seek_-80_playing_True": true,
+    "phone_drag_seek_80_playing_True": true,
+    "phone_cancelled_selection_stays_browsing": true
+  },
+  "page_errors": [],
+  "limits": "Local production build, synthetic media, Chromium mouse/touch emulation; no physical iPad Safari."
+}

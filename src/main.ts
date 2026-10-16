@@ -41,6 +41,7 @@ import type { spring } from "@applemusic-like-lyrics/core";
 type SpringParams = spring.SpringParams;
 (window as any).lyrics = lyrics;
 import { SpeechLyricPlayer } from "./practice/speech-lyric-player";
+import { LocalBackgroundMemory, MAX_BACKGROUND_BYTES, type BackgroundStatus } from './practice/local-background';
 import { audioTimeSeconds, lyricTimeMs, clampSeek } from "./practice/timing";
 
 import { LocalSessionMemory, IndexedDBSessionStore, CorruptSessionError, type SavedCaptions, type SaveStatus } from "./practice/local-session";
@@ -155,6 +156,11 @@ class WebLyricsPlayer {
   // Successful selections outlive the native input, which is cleared for reselection.
   private selectedMusicFile: File | null = null;
   private selectedLyricFile: File | null = null;
+  private selectedCoverFile: File | null = null;
+  private coverLoadId = 0;
+  private coverObjectUrl: string | null = null;
+  private coverSourceExplicit = false;
+  private backgroundRestoreReady: Promise<void> = Promise.resolve();
   private musicLoadId = 0;
   private lyricLoadId = 0;
   private currentCaptions: SavedCaptions | null = null;
@@ -162,7 +168,9 @@ class WebLyricsPlayer {
   private restoreEpoch = 0;
   private restoringLocal = false;
   private localRestoreReady: Promise<void> = Promise.resolve();
-  private localMemory = new LocalSessionMemory(new IndexedDBSessionStore(), status => this.renderLocalSaveStatus(status));
+  private localStore = new IndexedDBSessionStore();
+  private localMemory = new LocalSessionMemory(this.localStore, status => this.renderLocalSaveStatus(status));
+  private backgroundMemory = new LocalBackgroundMemory(this.localStore, status => this.renderBackgroundSaveStatus(status));
   private musicFileBtn: HTMLElement | null = null;
   private lyricFileBtn: HTMLElement | null = null;
   private coverFileBtn: HTMLElement | null = null;
@@ -309,20 +317,6 @@ class WebLyricsPlayer {
         (el as HTMLInputElement).placeholder = t(key);
       }
     });
-  }
-
-  private initUploadButtons() {
-    if (this.coverFile) {
-      this.coverFile.addEventListener('change', (e: Event) => {
-        const hasFile = (e.target as HTMLInputElement).files?.[0];
-        const uploadIcon = this.coverFileBtn?.querySelector('.upload-icon') as HTMLElement;
-        const uploadedIcon = this.coverFileBtn?.querySelector('.uploaded-icon') as HTMLElement;
-        if (uploadIcon && uploadedIcon) {
-          uploadIcon.style.display = hasFile ? 'none' : 'block';
-          uploadedIcon.style.display = hasFile ? 'block' : 'none';
-        }
-      });
-    }
   }
 
   private updateRoundedCover() {
@@ -1669,10 +1663,10 @@ class WebLyricsPlayer {
 
     this.coverFile?.addEventListener("change", (e) => {
       if (!e.target) return;
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        this.loadCoverFromFile(file);
-      }
+      const input = e.target as HTMLInputElement;
+      const file = input.files?.[0];
+      input.value = '';
+      if (file) void this.loadCoverFromFile(file);
     });
 
     this.songTitleInput
@@ -2902,8 +2896,7 @@ class WebLyricsPlayer {
     const bounded = clampSeek(target, duration, this.state.isRangeMode
       ? [this.state.rangeStartTime, this.state.rangeEndTime] : undefined);
     if (bounded === null) return;
-    if (fromLine) this.lyricPlayer.holdPosition(lyricTimeMs(bounded, this.state.lyricDelay));
-    else if (follow && !this.lyricPlayer.isPositionHeld) this.lyricPlayer.resetScroll();
+    if (follow) this.lyricPlayer.resetScroll();
     this.audio.currentTime = bounded;
     this.syncPlayback(true);
     this.rememberLocalProgress(true);
@@ -3109,8 +3102,6 @@ class WebLyricsPlayer {
   }
 
   private initUI() {
-    this.initUploadButtons();
-
     if (this.lyricsPanel && this.lyricPlayer.getElement()) {
       this.lyricsPanel.appendChild(this.lyricPlayer.getElement());
     }
@@ -3329,20 +3320,53 @@ class WebLyricsPlayer {
     }
   }
 
-  private async loadCoverFromFile(file: File) {
+  private async loadCoverFromFile(file: File, restoring = false, restoreId?: number): Promise<boolean> {
+    const id = restoreId ?? ++this.coverLoadId;
+    if (!restoring) this.backgroundMemory.cancelPending();
+    let url: string | null = null;
     try {
-      const url = URL.createObjectURL(file);
+      if (!file.size || file.size > MAX_BACKGROUND_BYTES) throw new Error('請選擇 20 MiB 以內、非空白的背景圖片。');
+      url = URL.createObjectURL(file);
+      await new Promise<void>((resolve, reject) => {
+        const image = new Image();
+        const timer = window.setTimeout(() => finish(new Error('圖片讀取逾時，請選擇較小圖片。')), 10000);
+        const finish = (error?: Error) => {
+          clearTimeout(timer); image.onload = image.onerror = null; image.src = '';
+          if (error) reject(error); else resolve();
+        };
+        image.onload = () => finish(image.naturalWidth && image.naturalHeight && image.naturalWidth * image.naturalHeight <= 64000000
+          ? undefined : new Error('圖片尺寸過大或無效，請選擇 6400 萬像素以內的圖片。'));
+        image.onerror = () => finish(new Error('無法讀取圖片，請選擇此瀏覽器支援的 PNG、JPEG 或 WebP 等圖片。'));
+        image.src = url!;
+      });
+      if (id !== this.coverLoadId) return false;
+      const previous = this.coverObjectUrl;
+      this.coverObjectUrl = url;
+      this.coverSourceExplicit = true;
+      this.selectedCoverFile = file;
       this.state.coverUrl = url;
+      if (this.coverUrl) this.coverUrl.value = '';
       this.updateBackground();
-      this.background.setAlbum(url || "./icons/icon-512x512.png");
+      void this.background.setAlbum(url);
+      if (previous) URL.revokeObjectURL(previous);
       await this.extractAndProcessCoverColor(url);
+      if (id !== this.coverLoadId) return false;
       this.applyDominantColorAsCSSVariable();
       this.updateBackground();
       this.updateSongInfo();
       this.updateFileInputDisplay("coverFile", file);
       this.showStatus(t("coverLoadSuccess"));
+      if (restoring) this.renderBackgroundSaveStatus({ phase: 'saved', message: '背景圖片已從本機恢復。' });
+      else void this.backgroundMemory.save(file);
+      return true;
     } catch (error) {
-      this.showStatus(t("coverLoadFailed"), true);
+      if (id === this.coverLoadId) {
+        this.renderBackgroundSaveStatus({ phase: 'error', message: error instanceof Error ? error.message : t('coverLoadFailed') });
+        this.showStatus(t("coverLoadFailed"), true);
+      }
+      return false;
+    } finally {
+      if (url && url !== this.coverObjectUrl) URL.revokeObjectURL(url);
     }
   }
 
@@ -3528,6 +3552,7 @@ class WebLyricsPlayer {
     }
 
     if (coverUrl) {
+      this.useExplicitCoverInput();
       const urlPattern = /^https?:\/\/.+/;
       if (urlPattern.test(coverUrl.trim())) {
         this.state.coverUrl = coverUrl;
@@ -3590,7 +3615,7 @@ class WebLyricsPlayer {
   private async loadFromFiles() {
     const musicFile = this.selectedMusicFile;
     const lyricFile = this.selectedLyricFile;
-    const coverFile = this.coverFile?.files?.[0];
+    const coverFile = this.selectedCoverFile;
 
     if (musicFile) {
       await this.loadMusicFromFile(musicFile);
@@ -3601,7 +3626,7 @@ class WebLyricsPlayer {
       await this.loadLyricFromFile(lyricFile);
     }
 
-    if (coverFile) {
+    if (coverFile && coverFile === this.selectedCoverFile) {
       await this.loadCoverFromFile(coverFile);
     }
   }
@@ -3610,6 +3635,7 @@ class WebLyricsPlayer {
     if (!input.trim()) {
       return;
     }
+    this.useExplicitCoverInput();
 
     const urlPattern = /^https?:\/\/.+/;
     if (urlPattern.test(input.trim())) {
@@ -4441,6 +4467,7 @@ class WebLyricsPlayer {
     this.cancelLocalRestore();
     this.currentCaptions = null;
     void this.localMemory.clear();
+    this.clearLocalBackground();
     ++this.musicLoadId;
     ++this.lyricLoadId;
     this.selectedMusicFile = null;
@@ -5045,7 +5072,7 @@ class WebLyricsPlayer {
             }
 
             // 提取封面图片
-            if (tag.tags && tag.tags.picture) {
+            if (tag.tags && tag.tags.picture && !this.coverSourceExplicit) {
               console.log("Found cover image:", tag.tags.picture);
               const { data, format } = tag.tags.picture;
               let base64String = "";
@@ -5464,7 +5491,12 @@ class WebLyricsPlayer {
       ++this.musicLoadId;
       ++this.lyricLoadId;
       void this.localMemory.clear();
+      this.clearLocalBackground();
     });
+    document.getElementById('saveLocalBackground')?.addEventListener('click', () => {
+      if (this.selectedCoverFile) void this.backgroundMemory.save(this.selectedCoverFile);
+    });
+    document.getElementById('clearLocalBackground')?.addEventListener('click', () => this.clearLocalBackground());
     this.audio.addEventListener('timeupdate', () => this.rememberLocalProgress());
     this.audio.addEventListener('pause', () => this.rememberLocalProgress(true));
     this.audio.addEventListener('seeked', () => this.rememberLocalProgress(true));
@@ -5475,6 +5507,58 @@ class WebLyricsPlayer {
     const params = new URLSearchParams(location.search);
     if (params.has('music') || params.has('lyric')) this.localMemory.detach();
     else this.localRestoreReady = this.restoreLocalSession();
+    if (!params.has('cover') && !this.coverSourceExplicit) this.backgroundRestoreReady = this.restoreLocalBackground();
+  }
+
+  private renderBackgroundSaveStatus(status: BackgroundStatus) {
+    const panel = document.getElementById('localSavePanel');
+    if (panel) panel.dataset.backgroundPhase = status.phase;
+    const detail = document.getElementById('backgroundSaveStatus');
+    if (detail) detail.textContent = status.message;
+    const retry = document.getElementById('saveLocalBackground') as HTMLButtonElement | null;
+    if (retry) retry.disabled = !this.selectedCoverFile;
+  }
+
+  private async restoreLocalBackground() {
+    const id = ++this.coverLoadId;
+    this.renderBackgroundSaveStatus({ phase: 'loading', message: '正在讀取本機背景圖片…' });
+    try {
+      const saved = await this.backgroundMemory.read();
+      if (id !== this.coverLoadId) return;
+      if (!saved) {
+        this.renderBackgroundSaveStatus({ phase: 'empty', message: '選入本機背景／封面圖片後會自動保存（上限 20 MiB）。' });
+        return;
+      }
+      await this.loadCoverFromFile(new File([saved.blob], saved.name, { type: saved.type, lastModified: saved.lastModified }), true, id);
+    } catch (error) { if (id === this.coverLoadId) this.backgroundMemory.reportFailure(error); }
+  }
+
+  private clearLocalBackground() {
+    ++this.coverLoadId;
+    this.selectedCoverFile = null;
+    this.coverSourceExplicit = false;
+    if (this.coverObjectUrl) URL.revokeObjectURL(this.coverObjectUrl);
+    this.coverObjectUrl = null;
+    this.state.coverUrl = '';
+    if (this.coverFile) this.coverFile.value = '';
+    if (this.coverUrl) this.coverUrl.value = '';
+    this.updateFileInputDisplay('coverFile', '');
+    this.setDefaultColors();
+    this.applyDominantColorAsCSSVariable();
+    this.updateBackground();
+    void this.background.setAlbum('./icons/icon-512x512.png');
+    this.updateSongInfo();
+    void this.backgroundMemory.clear();
+  }
+
+  private useExplicitCoverInput() {
+    ++this.coverLoadId;
+    this.backgroundMemory.cancelPending();
+    this.selectedCoverFile = null;
+    this.coverSourceExplicit = true;
+    if (this.coverObjectUrl) URL.revokeObjectURL(this.coverObjectUrl);
+    this.coverObjectUrl = null;
+    this.renderBackgroundSaveStatus({ phase: 'detached', message: '網址背景僅供本次使用；先前本機圖片仍保留。需保存圖片請選入本機檔案。' });
   }
 
   private renderLocalSaveStatus(status: SaveStatus) {
@@ -5617,6 +5701,7 @@ class WebLyricsPlayer {
         img.onerror = () => reject(new Error('Failed to load image'));
         img.src = imageUrl;
       });
+      if (this.state.coverUrl !== imageUrl) return;
       const [r, g, b] = this.colorThief.getColor(img);
       const hsl = this.rgbToHsl(r, g, b);
       hsl[2] = 0.8;
@@ -5638,6 +5723,7 @@ class WebLyricsPlayer {
         }
       }
     } catch (error) {
+      if (this.state.coverUrl !== imageUrl) return;
       this.setDefaultColors();
       this.applyDominantColorAsCSSVariable();
     }

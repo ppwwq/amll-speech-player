@@ -1,0 +1,26 @@
+{
+  "cases": {
+    "binary_hash_and_new_object_url_on_reload_with_complete_paused_media": true,
+    "real_browser_process_restart_restores_image": true,
+    "replace_reselect_empty_wrong_mime_and_cancel": true,
+    "invalid_empty_and_oversize_images_preserve_previous_image": true,
+    "quota_failure_keeps_old_record_and_retry_saves_current_preview": true,
+    "request_success_then_transaction_abort_does_not_report_saved": true,
+    "clear_image_retry_and_reload_preserve_audio_captions": true,
+    "clear_wins_pending_write_without_resurrection": true,
+    "multi_file_load_respects_newer_image": true,
+    "multi_file_load_respects_clear": true,
+    "manual_selection_wins_slow_restore": true,
+    "old_missing_or_corrupt_url_record_does_not_break_media_and_can_recover": true,
+    "temporary_url_does_not_overwrite_local_image": true,
+    "existing_stats_checkbox_hides_panel_and_preference_survives_reload": true,
+    "replacing_audio_and_embedded_artwork_do_not_override_custom_image": true,
+    "existing_glass_menu_mobile_bounds": true,
+    "clear_all_removes_both_independent_records": true,
+    "full_reset_clears_image_without_restore_race": true,
+    "blocked_storage_keeps_image_preview_and_clear_controls_usable": true
+  },
+  "page_errors": [],
+  "non_read_requests": [],
+  "limits": "Synthetic images/audio, local production build and persistent Chromium profiles. Storage failures injected; no physical iPad Safari or actual disk-exhaustion test."
+}

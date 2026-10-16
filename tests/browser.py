@@ -134,8 +134,10 @@ async def main():
   assert (await state(tablet))['following']
   await drag(tablet,dy=-70)
   await tablet.wait_for_timeout(6500)
+  assert not (await state(tablet))['following']
+  await tablet.locator('#followPlayback').tap()
   assert (await state(tablet))['following']
-  results['explicit_and_idle_follow']=True
+  results['browse_stays_manual_until_explicit_follow']=True
   # Native Chromium touch cancellation, long press, and multi-touch must not seek.
   await tablet.evaluate('player.seekAudio(0)')
   await tablet.wait_for_timeout(500)

@@ -1,0 +1,13 @@
+{
+  "initial_panel": {
+    "width": "320px",
+    "right": "20px",
+    "opacity": "1"
+  },
+  "native_checkbox_hides_stats_on_reload": true,
+  "shown": {
+    "display": "block",
+    "ms": "block",
+    "label": "Show Performance Monitor"
+  }
+}

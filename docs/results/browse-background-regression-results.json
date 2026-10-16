@@ -1,0 +1,64 @@
+{
+  "validation": "Local production build; generated media only",
+  "node_tests": {
+    "passed": 28,
+    "failed": 0
+  },
+  "typecheck": "passed",
+  "production_build": "passed",
+  "browser_suites": {
+    "local_background": {
+      "exit_code": 0,
+      "seconds": 17.6
+    },
+    "browse_position": {
+      "exit_code": 0,
+      "seconds": 200.2
+    },
+    "preferences": {
+      "exit_code": 0,
+      "seconds": 30.1
+    },
+    "local_session": {
+      "exit_code": 0,
+      "seconds": 27.9
+    },
+    "file_import": {
+      "exit_code": 0,
+      "seconds": 13.1
+    },
+    "browser": {
+      "exit_code": 0,
+      "seconds": 51.6
+    },
+    "drag_seek": {
+      "exit_code": 0,
+      "seconds": 46.0
+    },
+    "drag_preview": {
+      "exit_code": 0,
+      "seconds": 27.1
+    },
+    "drag_replay": {
+      "exit_code": 0,
+      "seconds": 107.5
+    },
+    "ui_checks": {
+      "exit_code": 0,
+      "seconds": 41.8
+    },
+    "top_layout": {
+      "exit_code": 0,
+      "seconds": 23.7
+    },
+    "seek_order": {
+      "exit_code": 0,
+      "seconds": 58.3
+    },
+    "tap_playback": {
+      "exit_code": 0,
+      "seconds": 120.6
+    }
+  },
+  "limits": "Chromium desktop/touch emulation and persistent profiles; storage faults injected. No physical iPad Safari, actual disk exhaustion, or production-site browser test."
+}
