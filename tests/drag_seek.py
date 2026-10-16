@@ -4,7 +4,7 @@ from playwright.async_api import async_playwright
 from browser import load,state,srt,OUT,BASE
 
 async def reset(page,time=0,delay=0):
- await page.evaluate('''({time,delay})=>{player.getAudio().pause();player.exitRangeMode();player.applyLyricDelay(delay);player.seekAudio(time)}''',{'time':time,'delay':delay})
+ await page.evaluate('''({time,delay})=>{player.getAudio().pause();player.exitRangeMode();player.applyLyricDelay(delay);player.getLyricPlayer().resetScroll();player.seekAudio(time)}''',{'time':time,'delay':delay})
  await page.wait_for_timeout(600)
  await page.evaluate('window.commits=[];window.seeks=0')
 
@@ -59,7 +59,7 @@ async def main():
   await desktop.screenshot(path=str(OUT/'drag-seek-desktop.png'))
   await end(desktop,g)
   st=await state(desktop);c=await counts(desktop)
-  assert abs(st['time']-before['seconds'])<.01 and st['paused'] and st['following'],(st,before)
+  assert abs(st['time']-before['seconds'])<.01 and st['paused'] and not st['following'],(st,before)
   assert c['commits']==[before['start']] and c['seeks']==1,c
   assert int(before['start']/3000) in st['hot'],st
   await desktop.wait_for_timeout(1800)

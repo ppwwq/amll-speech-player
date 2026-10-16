@@ -2902,7 +2902,8 @@ class WebLyricsPlayer {
     const bounded = clampSeek(target, duration, this.state.isRangeMode
       ? [this.state.rangeStartTime, this.state.rangeEndTime] : undefined);
     if (bounded === null) return;
-    if (follow) this.lyricPlayer.resetScroll();
+    if (fromLine) this.lyricPlayer.holdPosition(lyricTimeMs(bounded, this.state.lyricDelay));
+    else if (follow && !this.lyricPlayer.isPositionHeld) this.lyricPlayer.resetScroll();
     this.audio.currentTime = bounded;
     this.syncPlayback(true);
     this.rememberLocalProgress(true);

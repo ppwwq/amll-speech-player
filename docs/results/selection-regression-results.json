@@ -1,0 +1,60 @@
+{
+  "suites": {
+    "selection_position": {
+      "command": "python tests/selection_position.py",
+      "passed": true,
+      "seconds": 392.0
+    },
+    "preferences": {
+      "command": "python tests/preferences.py",
+      "passed": true,
+      "seconds": 30.2
+    },
+    "local_session": {
+      "command": "python tests/local_session.py",
+      "passed": true,
+      "seconds": 23.9
+    },
+    "browser": {
+      "command": "python tests/browser.py",
+      "passed": true,
+      "seconds": 51.7
+    },
+    "drag_seek": {
+      "command": "python tests/drag_seek.py",
+      "passed": true,
+      "seconds": 45.1
+    },
+    "drag_preview": {
+      "command": "python tests/drag_preview.py",
+      "passed": true,
+      "seconds": 28.0
+    },
+    "drag_replay": {
+      "command": "python tests/drag_replay.py",
+      "passed": true,
+      "seconds": 107.1
+    },
+    "ui_checks": {
+      "command": "python tests/ui_checks.py",
+      "passed": true,
+      "seconds": 41.5
+    },
+    "top_layout": {
+      "command": "python tests/top_layout.py",
+      "passed": true,
+      "seconds": 23.5
+    },
+    "seek_order": {
+      "command": "python tests/seek_order.py",
+      "passed": true,
+      "seconds": 57.2
+    },
+    "tap_playback": {
+      "command": "python tests/tap_playback.py",
+      "passed": true,
+      "seconds": 121.0
+    }
+  },
+  "limits": "Local production build, Chromium with mouse/touch/viewport emulation and synthetic media; no physical iPad Safari or production browser check. The independent file-import suite was not rerun for this change."
+}
