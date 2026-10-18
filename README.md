@@ -51,7 +51,9 @@ Tests generate only synthetic WAV/MP3 and SRT/LRC data in ignored `test-results/
 
 ## Static deployment
 
-`dist/` is self-contained and works under a repository subpath. Cloudflare Workers Static Assets serves the player at [amll-speech-player.philipwwq.workers.dev](https://amll-speech-player.philipwwq.workers.dev/), using `wrangler.jsonc`. No server function or application secret is required. Build and deploy with an already authorized Cloudflare account:
+`dist/` is self-contained and works under a repository subpath. The production site is [amll-speech-player.pages.dev](https://amll-speech-player.pages.dev/). Cloudflare Pages is connected to `ppwwq/amll-speech-player` and automatically builds and deploys `main` through its native GitHub integration. Its dashboard configuration uses root `/`, build command `pnpm build`, output directory `dist`, `NODE_VERSION=24.16.0` and `PNPM_VERSION=10.13.1`. No server function or application secret is required.
+
+The existing [Workers Static Assets site](https://amll-speech-player.philipwwq.workers.dev/) remains available as a manual fallback, using `wrangler.jsonc`. Pages uses its dashboard build configuration; the Workers configuration is retained for manual deployments. To update the fallback with an already authorized Cloudflare account:
 
 ```sh
 pnpm install --frozen-lockfile --ignore-scripts
@@ -59,11 +61,11 @@ pnpm typecheck && pnpm test && pnpm build
 pnpm dlx wrangler@4.129.0 deploy
 ```
 
-Cloudflare deployment currently uses the CLI. GitHub Actions runs type checks, tests and the production build; it does not deploy to Cloudflare. To enable automatic deployment, connect `ppwwq/amll-speech-player` in the Worker's **Settings > Builds**, authorize only the required repository if prompted, and choose production branch `main`, build command `pnpm build`, deploy command `pnpm dlx wrangler@4.129.0 deploy`, Node 22.12+ and pnpm 10.13.1. An authorized build token is also required. The configuration file alone does not enable this integration.
+GitHub Actions runs type checks, tests and the production build; Pages' separate Git integration publishes the production site. The Workers fallback is not connected to Workers Builds. A source push therefore updates Pages without requiring a Workers Builds API token or changing the existing GitHub App installation's repository access.
 
-The existing [Vercel site](https://amll-speech-player.vercel.app/) and its Git integration remain available. There is no redirect between the two sites. Browser storage is isolated by origin: the Cloudflare site starts with separate saved files, progress, background and settings. Reimport original files at the new site; keep the old site available to recover its saved session. No automatic browser-data migration is provided.
+The existing [Vercel site](https://amll-speech-player.vercel.app/) and its Git integration remain available. There are no redirects between the Pages, Workers and Vercel sites. Browser storage is isolated by origin: each site has separate saved files, progress, background and settings. Reimport original files at the new site; keep the old sites available to recover their saved sessions. No automatic browser-data migration is provided.
 
-To return immediately to the previous host, open the Vercel URL. To roll back a future Cloudflare release, use `pnpm dlx wrangler@4.129.0 rollback <VERSION_ID>` from this project, or rebuild a known good commit and redeploy it. The first deployment has no earlier Cloudflare version to roll back to.
+To return immediately to a previous host, open the Vercel or Workers URL. For Pages, select a previous successful production deployment in the dashboard and choose **Rollback to this deployment**; the next push to `main` deploys the new commit again. To roll back a future release of the separate Workers fallback, use `pnpm dlx wrangler@4.129.0 rollback <VERSION_ID>`, or rebuild a known good commit and redeploy it. Each host's first deployment has no earlier version to roll back to.
 
 The broken upstream development service worker has been removed. This build does not promise offline caching. The **Source · AGPL-3.0** link downloads the build's corresponding source archive from the same static host, including build/test scripts and the dependency lockfile.
 
