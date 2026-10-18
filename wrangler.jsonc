@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/wrangler@4.129.0/config-schema.json",
+  "name": "amll-speech-player",
+  "account_id": "86eac8fedb92cf5e11c160669b5605b7",
+  "compatibility_date": "2026-10-18",
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": "./dist"
+  }
+}

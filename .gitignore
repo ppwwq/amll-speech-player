@@ -55,6 +55,7 @@ tmp/
 
 # Misc
 .vercel
+.wrangler/
 .netlify
 .turbo
 # Generated source download and synthetic test output
